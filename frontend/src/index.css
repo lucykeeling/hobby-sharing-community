@@ -48,7 +48,7 @@ body {
 }
 
 a {
-    color: var(color-gray-700);
+    color: var(--color-gray-700);
     text-decoration: none;
 }
 
@@ -118,7 +118,7 @@ section {
 
 .btn.category {
     background: var(--color-bg);
-    color: var(--color-primary);
+    color: var(--primary-color);
     font-size: 0.75rem;
     font-weight: 400;
 }
@@ -135,7 +135,7 @@ section {
 }
 
 .btn:hover {
-    background: var(color--gray-900);
+    background: var(--color-gray-900);
     color: var(--color-white);
 }
 
@@ -157,7 +157,7 @@ nav {
     height: 5rem; 
     display: grid;
     place-items: center;
-    background: var(225, 255, 255, 0.5);
+    background: rgba(225, 255, 255, 0.5);
     position: fixed;
     top: 0;
     left: 0;
@@ -167,7 +167,7 @@ nav {
 }
 
 .nav_container {
-    diplay: flex;
+    display: flex;
     justify-content: space-between;
     align-items: center;
     height: 100%;
@@ -279,3 +279,33 @@ footer {
     overflow: hidden;
 }
 
+/*============POSTS DETAIL============*/
+.post-detail {
+    width: var(--form-width);
+    background: var(--color-white);
+    margin-inline: auto;
+    padding: 2rem;
+}
+
+.post-detail_header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.post-detail_buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.post-detail_image {
+    margin: 1rem 0;
+    height: fit-content;
+    max-height: 30rem;
+    overflow: hidden;
+}
+
+.post-detail p {
+    margin-bottom: 0.7rem;
+}
