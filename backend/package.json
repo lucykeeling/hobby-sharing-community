@@ -2,6 +2,7 @@
   "name": "task-manager-backend",
   "version": "1.0.0",
   "description": "Backend for Task Manager App",
+  "type":"module",
   "main": "server.js",
   "scripts": {
     "test": "mocha",
