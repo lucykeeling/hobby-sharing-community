@@ -2,7 +2,7 @@ import React from 'react';
 import PostItem from '../components/PostItem';
 
 const CategoryPosts = () => {
-    const [posts, setPosts] = React.useState([DUMMY_POSTS]);
+    const [posts, setPosts] = React.useState([]);
     return (
                 <section className="category_posts">
             {posts.length > 0 ? <div className="container post_container">

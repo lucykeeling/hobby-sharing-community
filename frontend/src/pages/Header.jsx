@@ -15,8 +15,9 @@ const Header = () => {
                     </Link>
                 <ul className="nav_menu">
                     <li><Link to="/" className="nav-links">Home</Link> </li>
-                    <li><Link to="/about" className="nav-links">Create Post</Link> </li>
-                    <li><Link to="/services" className="nav-links">Authors</Link> </li>
+                    <li><Link to="/createpost" className="nav-links">Create Post</Link> </li>
+                    <li><Link to="/authors" className="nav-links">Authors</Link> </li>
+                    <li><Link to ="/dashboard" className="nav-links">Dashboard</Link> </li>
                     <li><Link to="/contact" className="nav-links">Logout</Link> </li>
                     </ul>
                     <button className= "nav_toggle-btn">
