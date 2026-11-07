@@ -1,17 +1,19 @@
 import React from 'react';
 import PostAuthor from '../components/PostAuthor';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import image from '../images/post_image.png';
 
+
 const PostDetail = () => {
+const {id} = useParams();
     return (
         <section className="post-detail">
             <div className="container post-detail_container">
              <div className="post-detail_header">
                 <PostAuthor/>
                 <div className="post-detail_buttons">
-                    <Link to={`/post/:id/edit`} className="btn sm primary">Edit</Link>
-                    <Link to={`/post/:id/delete`} className="btn sm danger">Delete</Link>
+                    <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
+                    <Link to={`/post/${id}/delete`} className="btn sm danger">Delete</Link>
                 </div>
              </div>
              <h1> This is the post title!</h1>

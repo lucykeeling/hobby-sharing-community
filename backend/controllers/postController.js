@@ -45,4 +45,26 @@ const createPost = async (req, res) => {
     }
 };
 
-module.exports = { createPost };
+// Get all posts
+const getAllPosts = async (req, res) => {
+    try {
+        const posts = await Post.find().sort({ createdAt: -1 }).populate('creator', 'username');
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};  
+
+// Get user's posts
+const getUserPosts = async (req, res) => {
+    try {
+        const posts = await Post.find({ creator: req.user.id }).sort({ createdAt: -1 }).populate('creator', 'username');
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};  
+
+
+  
+        module.exports = { createPost, getAllPosts, getUserPosts };
