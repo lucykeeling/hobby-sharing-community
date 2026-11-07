@@ -1,9 +1,11 @@
-const addPost = async (req, res) => {
-        const { title, content, category, media } = req.body;
-        try {
-            const newPost = await Post.create({ userId: req.user.id, title, content, category, media });
-            res.status(201).json(newPost);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    };
+const mongoose = require('mongoose');
+
+const postSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    category: { type: String, required: true },
+    description: { type: String, required: true },
+    image: { type: String, required: true },
+    creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+});
+
+module.exports = mongoose.model('Post', postSchema);

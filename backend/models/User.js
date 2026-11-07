@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     university: { type: String },
     address: { type: String },
+    postCount: { type: Number, default: 0 },
 });
 
 userSchema.pre('save', async function (next) {

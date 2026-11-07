@@ -16,7 +16,6 @@ import CategoryPosts from './pages/CategoryPosts';
 function App() {
   return (
     <Router>
-      <Navbar />
       <Header />
       <Routes>
         <Route path="/login" element={<Login />} />
