@@ -1,6 +1,6 @@
-/** @tailwind base;
+ @tailwind base;
 @tailwind components;
-@tailwind utilities;**/
+@tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
 
@@ -142,7 +142,7 @@ section {
 .center {
     text-align: center;
     padding-top: 5rem;
-    margin-incline: center;
+    margin-inline: center;
     display: block;
     width: 100%
 }
@@ -157,7 +157,7 @@ nav {
     height: 5rem; 
     display: grid;
     place-items: center;
-    background: rgba(225, 255, 255, 0.5);
+    background: var(--color-bg);
     position: fixed;
     top: 0;
     left: 0;
@@ -407,4 +407,14 @@ footer {
     overflow: scroll;
     background: var(--color-white);
     height: 8rem;
+}
+
+/*============Register Form ============*/
+.register small, login small {
+    display: block;
+    margin-top: 1.5rem;
+}
+
+.register small a, .login small a {
+    color: var(--primary-color);
 }

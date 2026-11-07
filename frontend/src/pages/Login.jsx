@@ -40,6 +40,9 @@ const Login = () => {
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
           Login
         </button>
+        <small className="text-center text-sm text-gray-500">
+          Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
+        </small>
       </form>
     </div>
   );

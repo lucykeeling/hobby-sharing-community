@@ -45,6 +45,9 @@ const Register = () => {
         <button type="submit" className="w-full bg-green-600 text-white p-2 rounded">
           Register
         </button>
+        <small className="text-center text-sm text-gray-500">
+          Already have an account? <a href="/login" className="text-green-600 hover:underline">Log in</a>
+        </small>
       </form>
     </div>
   );
