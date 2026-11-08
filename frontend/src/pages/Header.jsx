@@ -26,7 +26,15 @@ const Header = () => {
                         <li><Link to="/createpost" className="nav-links">Create Post</Link> </li>
                         <li><Link to="/categories" className="nav-links">Browse by Category</Link> </li>
                         <li><Link to ="/dashboard" className="nav-links">Dashboard</Link> </li>
+
+                        {user.role === 'Admin' && (
+                        <li><Link to="/moderate" className="nav-links">Moderate Posts</Link> </li>
+                        )}
+
+
+                        <li><Link to="/profile" className="nav-links">Profile</Link> </li>
                         <li><button onClick={handleLogout} className="nav-links">Logout</button></li>
+                    
                         </>
                     ) : (
                         <>

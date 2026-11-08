@@ -365,7 +365,7 @@ footer {
     gap: 1rem;
 }
 
-.form input, .form select, .form textarea {
+.form input:not([type="radio"]), .form select, .form textarea {
     width: 100%;
     padding: 0.8rem 1rem;
     border: 1px solid var(--color-gray-300);
@@ -380,7 +380,7 @@ footer {
     min-height: 10rem;
 }
 
-.form input:focus, .form select:focus, .form textarea:focus {
+.form input:not([type="radio"]):focus, .form select:focus, .form textarea:focus {
     outline: none;
     border-color: var(--primary-color);
 }
@@ -417,4 +417,19 @@ footer {
 
 .register small a, .login small a {
     color: var(--primary-color);
+}
+
+/*============Profile Form ============*/
+.profile-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-2);
+    background: var(--color-white);
+    color: var(--color-gray-900);
+    font: inherit;
+}
+
+.profile-input:focus {
+    border-color: var(--primary-color);
 }

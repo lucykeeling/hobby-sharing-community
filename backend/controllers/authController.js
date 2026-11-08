@@ -25,7 +25,7 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
-            res.json({ id: user.id, name: user.name, email: user.email, token: generateToken(user.id) });
+            res.json({ id: user.id, name: user.name, email: user.email, role: user.role, token: generateToken(user.id) });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
         }
@@ -60,11 +60,18 @@ const updateUserProfile = async (req, res) => {
         const { name, email, role } = req.body;
         user.name = name || user.name;
         user.email = email || user.email;
-        user.role = req.body.role || user.role; // Only allow role change if provided
+        
+        if (req.body.role && req.body.role !== user.role) {
+            if (req.user.role !== 'Admin') {
+                return res.status(403).json({ message: 'Only admins can change roles' });
+            }
+            user.role = req.body.role;
+        }
+    
         user.postCount = req.body.postCount || user.postCount; // Only allow post count change if provided
 
         const updatedUser = await user.save();
-        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, token: generateToken(updatedUser.id) });
+        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role, token: generateToken(updatedUser.id) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

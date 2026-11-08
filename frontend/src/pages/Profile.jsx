@@ -7,10 +7,11 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    university: '',
-    address: '',
+    role: '',
+    postCount: '',
   });
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Fetch profile data from the backend
@@ -23,9 +24,9 @@ const Profile = () => {
         setFormData({
           name: response.data.name,
           email: response.data.email,
-          university: response.data.university || '',
-          address: response.data.address || '',
+          role: response.data.role,
         });
+        setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
         alert('Failed to fetch profile. Please try again.');
       } finally {
@@ -57,36 +58,44 @@ const Profile = () => {
 
   return (
     <div className="max-w-md mx-auto mt-20">
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
-        <h1 className="text-2xl font-bold mb-4 text-center">Your Profile</h1>
-        <input
+      <form onSubmit={handleSubmit} className="form bg-white p-6 rounded shadow-md">
+        <h1 className="text-2xl font-bold text-center">Your Profile</h1>
+        <input 
           type="text"
           placeholder="Name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
+          className = "profile-input mb-4"
         />
         <input
           type="email"
           placeholder="Email"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
+          className = "profile-input mb-4"
         />
-        <input
-          type="text"
-          placeholder="University"
-          value={formData.university}
-          onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-          className="w-full mb-4 p-2 border rounded"
-        />
+        {isAdmin && (
+          <fieldset>
+            <legend className="mb-2 font-semibold">Role</legend>
+            {[
+            { value: 'Member', label: 'Member' },
+            { value: 'Admin', label: 'Admin' },
+             ].map(({ value, label }) => (
+            <label key={value} className="mr-6 inline-flex items-center">
+            <input
+            type="radio"
+            name="role"
+            value={value}
+            checked={formData.role === value}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            className="mr-2"
+          />
+          {label}
+          </label>
+          ))}
+          </fieldset>
+)}
+
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
           {loading ? 'Updating...' : 'Update Profile'}
         </button>
