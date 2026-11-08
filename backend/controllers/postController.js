@@ -135,5 +135,40 @@ const editPost = async (req, res) => {
     }
 };
 
+//Delete post
+const deletePost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const post = await Post.findById(postId);
 
-module.exports = { createPost, getAllPosts, getUserPosts, getPost, editPost };
+    if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+    }
+    if (post.creator.toString() !== req.user.id) {
+        return res.status(403).json({ message: 'You are not the owner of this post' });
+    }
+
+const fileName = post.image
+
+        //delete image from uploads folder
+        fs.unlink(path.join(__dirname, '../uploads/', fileName), async (err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Could not delete image file' });
+            } else {
+                await Post.findByIdAndDelete(postId);
+                //find user and reduce postCount by 1
+                const currentUser = await User.findById(req.user.id);
+                const userPostCount = currentUser.postCount > 0 ? currentUser.postCount - 1 : 0;
+                await User.findByIdAndUpdate(req.user.id, { postCount: userPostCount });
+                res.status(200).json({ message: 'Post deleted successfully' });
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+
+module.exports = { createPost, getAllPosts, getUserPosts, getPost, editPost, deletePost };

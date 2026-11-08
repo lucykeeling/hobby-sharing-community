@@ -24,7 +24,7 @@ const Header = () => {
                         <>
 
                         <li><Link to="/createpost" className="nav-links">Create Post</Link> </li>
-                        <li><Link to="/categories" className="nav-links">Categories</Link> </li>
+                        <li><Link to="/categories" className="nav-links">Browse by Category</Link> </li>
                         <li><Link to ="/dashboard" className="nav-links">Dashboard</Link> </li>
                         <li><button onClick={handleLogout} className="nav-links">Logout</button></li>
                         </>

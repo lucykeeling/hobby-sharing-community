@@ -1,11 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link , useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
+
 
 const Dashboard = () => {
     const [posts, setPosts] = React.useState([]);
     const { user } = useAuth();
+    const navigate = useNavigate();
     
     React.useEffect(() => {
         const fetchUserPosts = async () => {
@@ -20,6 +22,22 @@ const Dashboard = () => {
         };
         if (user)  fetchUserPosts();
     }, [user]);
+        const handleDelete = async (postId) => {
+            if (!window.confirm('Are you sure you want to delete this post?')) {
+                return;
+            }
+            try {
+                await axiosInstance.delete(`/api/posts/${postId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                });
+
+                setPosts(posts.filter(post => post._id !== postId));
+                alert('Post deleted successfully');
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                alert(error.response?.data?.message || 'Unable to delete post');
+            }       
+        };
 
     return (
         <section className="dashboard">
@@ -37,8 +55,8 @@ const Dashboard = () => {
                             <div className="dashboard_post-actions">
                             <Link to ={`/post/${post._id}`} className="btn sm">View</Link>
                             <Link to ={`/post/${post._id}/edit`} className="btn sm primary">Edit</Link>
-                            <Link to ={`/post/${post._id}/delete`} className="btn sm danger">Delete</Link>
-                            </div>
+                            <button onClick={() => handleDelete(post._id)} className="btn sm danger"> Delete </button>
+                             </div>
                             </article>
                     })
             }

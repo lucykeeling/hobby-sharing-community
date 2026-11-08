@@ -8,6 +8,7 @@ const postSchema = new mongoose.Schema({
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+    postStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
 });
 
 module.exports = mongoose.model('Post', postSchema);

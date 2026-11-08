@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import PostAuthor from '../components/PostAuthor';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
+import { useAuth } from '../context/AuthContext';
+
 
 const PostDetail = () => {
     const { id } = useParams();
     const [post, setPost] = useState(null);
+    const { user } = useAuth();
+    const navigate = useNavigate();
+ 
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -18,6 +23,20 @@ const PostDetail = () => {
         };
         fetchPost();
     }, [id]);
+    
+    const handleDelete = async () => {
+        if (!window.confirm('Delete this post? This cannot be undone.')) {
+        return;
+        }
+        try {
+        await axiosInstance.delete(`/api/posts/${id}`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+        });
+        navigate('/dashboard');
+        } catch (error) {
+        alert(error.response?.data?.message || 'Could not delete post');
+    }
+    };
 
     if (!post) {
         return <h2 className="center">Loading...</h2>;
@@ -30,7 +49,7 @@ const PostDetail = () => {
                     <PostAuthor />
                     <div className="post-detail_buttons">
                         <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
-                        <Link to={`/post/${id}/delete`} className="btn sm danger">Delete</Link>
+                        <button onClick={handleDelete} className="btn sm danger"> Delete </button>
                     </div>
                 </div>
                 <h1>{post.title}</h1>

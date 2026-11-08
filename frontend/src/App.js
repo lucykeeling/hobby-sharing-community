@@ -24,9 +24,8 @@ function App() {
         <Route path="/createpost" element={<CreatePost />} />
         <Route path="/" element={<Home />} />
         <Route path="/post/:id" element={<PostDetail />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/post/:id/edit" element={<EditPost />} />
-        <Route path="/post/:id/delete" element={<PostDetail />} />
         <Route path="/category/:category" element={<CategoryPosts />} />
       </Routes>
       <Footer />
