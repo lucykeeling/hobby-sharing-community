@@ -27,7 +27,7 @@ const ModeratePosts = () => {
     React.useEffect(() => {
         const fetchUserPosts = async () => {
             try {
-                const response = await axiosInstance.get(`/api/posts/user`, {
+                const response = await axiosInstance.get(`/api/posts/pending`, {
                     headers: { Authorization: `Bearer ${user.token}` },
                 });
                 setPosts(response.data);
@@ -37,23 +37,20 @@ const ModeratePosts = () => {
         };
         if (user)  fetchUserPosts();
     }, [user]);
-        const handleDelete = async (postId) => {
-            if (!window.confirm('Are you sure you want to delete this post?')) {
-                return;
-            }
+
+
+        const handleModerate = async (postId, status) => {
             try {
-                await axiosInstance.delete(`/api/posts/${postId}`, {
-                    headers: { Authorization: `Bearer ${user.token}` },
-                });
-
-                setPosts(posts.filter(post => post._id !== postId));
-                alert('Post deleted successfully');
+            const response = await axiosInstance.put(
+            `/api/posts/${postId}/moderate`, { postStatus: status }, {
+            headers: { Authorization: `Bearer ${user.token}` },
+            });
+            setPosts(posts.filter(post => post._id !== postId));
             } catch (error) {
-                console.error('Error deleting post:', error);
-                alert(error.response?.data?.message || 'Unable to delete post');
-            }       
+            console.error('Error moderating post:', error);
+            }
         };
-
+                                                            
     return (
         <section className="dashboard">
             {
@@ -69,8 +66,9 @@ const ModeratePosts = () => {
                                 </div>
                             <div className="dashboard_post-actions">
                             <Link to ={`/post/${post._id}`} className="btn sm">View</Link>
-                            <Link to ={`/post/${post._id}/edit`} className="btn sm primary">Edit</Link>
-                            <button onClick={() => handleDelete(post._id)} className="btn sm danger"> Delete </button>
+                            <button onClick={() => handleModerate(post._id, 'approved')} className="btn sm primary">Approve</button>
+                            <button onClick={() => handleModerate(post._id, 'rejected')} className="btn sm danger">Reject</button>
+
                              </div>
                             </article>
                     })

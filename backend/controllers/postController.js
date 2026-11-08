@@ -55,6 +55,15 @@ const getAllPosts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };  
+// Get all pending posts
+const getAllPendingPosts = async (req, res) => {
+    try {
+        const posts = await Post.find( { postStatus: 'pending' }).sort({ createdAt: -1 }).populate('creator', 'username');
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};  
 
 // Get user's posts
 const getUserPosts = async (req, res) => {
@@ -107,7 +116,6 @@ const searchPosts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 
 // Edit post
@@ -199,4 +207,38 @@ const fileName = post.image
     }
 };
 
-module.exports = { createPost, getAllPosts, getUserPosts, getPost, getCatPosts, searchPosts, editPost, deletePost };
+// ADMIN FUNCTIONS
+
+// Moderate Posts
+const moderatePost = async (req, res) => {
+    //get the post ID and post status    
+    try {
+     const postId = req.params.id;
+     const { postStatus } = req.body;
+
+        // Check if the user is an admin
+        if (req.user.role !== 'Admin') {
+            return res.status(403).json({ message: 'You do not have permission to moderate posts' });
+        }
+        // Validate the post status
+        if (!['approved', 'rejected'].includes(postStatus)) {
+                return res.status(400).json({ message: 'Invalid post status' });
+        }
+        //find the post and check it exists
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+                post.postStatus = postStatus;
+        //set the status and save
+                const updatedPost = await post.save();
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }       
+};            
+
+
+
+
+module.exports = { createPost, getAllPosts, getAllPendingPosts, getUserPosts, getPost, getCatPosts, searchPosts, editPost, deletePost, moderatePost };
