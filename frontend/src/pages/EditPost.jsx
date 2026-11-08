@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useNavigate, useParams } from 'react-router-dom';
+import axiosInstance from '../axiosConfig';
+import { useAuth } from '../context/AuthContext';
 
 const EditPost = () => {
-    const [title, setTitle] = React.useState('');
-    const [category, setCategory] = React.useState('');
-    const [description, setDescription] = React.useState('');
-    const [image, setImage] = React.useState('');
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const [title, setTitle] = useState('');
+    const [category, setCategory] = useState('Gardening');
+    const [description, setDescription] = useState('');
+    const [image, setImage] = useState(null);
+    const [currentImage, setCurrentImage] = useState('');
+    const [error, setError] = useState('');
 
     const modules = {
         toolbar: [
@@ -25,29 +34,78 @@ const EditPost = () => {
         'link', 'image'
     ];
 
-const Post_CATEGORIES = ['Gardening', 'Crochet', 'Exercise', 'Chess', 'Collecting', 'Cooking', 'Music', 'Travel', 'Drawing', 'DIY'];
-    
-    
+    const Post_CATEGORIES = ['Gardening', 'Crochet', 'Exercise', 'Chess', 'Collecting', 'Cooking', 'Music', 'Travel', 'Drawing', 'DIY'];
+
+    // Load the existing post into the form
+    useEffect(() => {
+        const fetchPost = async () => {
+            try {
+                const response = await axiosInstance.get(`/api/posts/${id}`);
+                setTitle(response.data.title);
+                setCategory(response.data.category);
+                setDescription(response.data.description);
+                setCurrentImage(response.data.image);
+            } catch (err) {
+                console.error('Failed to fetch post', err);
+                setError('Could not load post');
+            }
+        };
+        fetchPost();
+    }, [id]);
+
+    // Send the changes to the backend
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (!user) {
+            setError('You must be logged in to edit a post');
+            return;
+        }
+
+        const postData = new FormData();
+        postData.append('title', title);
+        postData.append('category', category);
+        postData.append('description', description);
+        if (image) {
+            postData.append('image', image);
+        }
+
+        try {
+            await axiosInstance.put(`/api/posts/${id}`, postData, {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            navigate(`/post/${id}`);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not edit post');
+        }
+    };
+
     return (
         <section className="create_post">
             <div className="container">
                 <h2> Edit Post </h2>
-                <p className="form_error-message">
-                    This is an error message.
-                </p>
-                <form action="" className="form create-post_form">
+                {error && <p className="form_error-message">{error}</p>}
+                <form onSubmit={handleSubmit} className="form create-post_form">
                     <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
                     <select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
                         {
-                            Post_CATEGORIES.map((category, index) => <option key={index} value={category}>{category}</option>)
+                            Post_CATEGORIES.map((cat, index) => <option key={index} value={cat}>{cat}</option>)
                         }
                     </select>
                     <ReactQuill modules={modules} formats={formats} value={description} onChange={setDescription} placeholder="Description" className="q1-editor" />
-                    <input type="file" placeholder="Image" value={image} onChange={(e) => setImage(e.target.files[0])} accept='png, jpg, jpeg' />
+                    {currentImage && (
+                        <img src={`http://localhost:5001/uploads/${currentImage}`} alt={title} style={{ maxWidth: '200px' }} />
+                    )}
+                    <input type="file" onChange={(e) => setImage(e.target.files[0])} accept="image/png, image/jpeg" />
                     <button type="submit" className="btn primary">Update</button>
                 </form>
             </div>
         </section>
-    )
-}
+    );
+};
+
 export default EditPost;

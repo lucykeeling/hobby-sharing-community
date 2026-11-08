@@ -9,6 +9,7 @@ import Footer from './pages/Footer';
 import PostDetail from './pages/PostDetail';
 import Dashboard from './pages/Dashboard';
 import CategoryPosts from './pages/CategoryPosts';
+import EditPost from './pages/EditPost';
 
 
 
@@ -24,7 +25,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/post/:id" element={<PostDetail />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="/post/:id/edit" element={<PostDetail />} />
+        <Route path="/post/:id/edit" element={<EditPost />} />
         <Route path="/post/:id/delete" element={<PostDetail />} />
         <Route path="/category/:category" element={<CategoryPosts />} />
       </Routes>
