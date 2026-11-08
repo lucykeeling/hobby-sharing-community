@@ -3,6 +3,17 @@ import { Link , useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
 
+const REJECT_REASONS = [
+    "Inappropriate content",
+    "Spam or misleading information",
+    "Violates community guidelines",
+    "Offensive language or hate speech",
+    "Copyright infringement",
+    "Low-quality image or content",
+    "Advertising or promotional content",
+]
+
+
 const Moderate = () => {
     const { user } = useAuth();
     
@@ -23,6 +34,8 @@ const ModeratePosts = () => {
     const [posts, setPosts] = React.useState([]);
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [rejectingPost, setRejectingPost] = React.useState(null);
+    const [reason, setReason] = React.useState('');
     
     React.useEffect(() => {
         const fetchUserPosts = async () => {
@@ -39,16 +52,27 @@ const ModeratePosts = () => {
     }, [user]);
 
 
-        const handleModerate = async (postId, status) => {
+        const handleModerate = async (postId, status, rejectionReason) => {
             try {
-            const response = await axiosInstance.put(
-            `/api/posts/${postId}/moderate`, { postStatus: status }, {
-            headers: { Authorization: `Bearer ${user.token}` },
+             await axiosInstance.put(
+            `/api/posts/${postId}/moderate`, { postStatus: status, rejectionReason }, 
+            {headers: { Authorization: `Bearer ${user.token}` },
             });
             setPosts(posts.filter(post => post._id !== postId));
             } catch (error) {
             console.error('Error moderating post:', error);
             }
+        };
+
+        const confirmReject = async() => {
+            if (!reason) return;
+            await handleModerate(rejectingPost._id, 'rejected', reason);
+            closeModal();
+        };
+
+        const closeModal = () => {
+            setRejectingPost(null);
+            setReason('');
         };
                                                             
     return (
@@ -67,13 +91,29 @@ const ModeratePosts = () => {
                             <div className="dashboard_post-actions">
                             <Link to ={`/post/${post._id}`} className="btn sm">View</Link>
                             <button onClick={() => handleModerate(post._id, 'approved')} className="btn sm primary">Approve</button>
-                            <button onClick={() => handleModerate(post._id, 'rejected')} className="btn sm danger">Reject</button>
-
-                             </div>
-                            </article>
+                            <button onClick={() => setRejectingPost(post)} className="btn sm danger">Reject</button>
+                            
+                            {rejectingPost && (
+                                    <div className="modal-overlay" onClick={closeModal}>
+                                        <div className = "modal" onClick={(e) => e.stopPropagation()}>
+                                            <h3>Reject Post "{rejectingPost.title}"</h3>
+                                            <label htmlFor="reason">Select a reason for rejection:</label>
+                                            <select id="reason" value={reason} onChange={(e) => setReason(e.target.value)}>
+                                                <option value="">Select a reason</option>
+                                                {REJECT_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                                                </select>
+                                                <div className="modal-actions">
+                                                <button onClick={closeModal} className="btn sm">Cancel</button>
+                                                <button className="btn sm danger" onClick={confirmReject} disabled={!reason}>Confirm Rejection</button>
+                                                </div>
+                                        </div>
+                                        </div>
+                                )}
+                                            </div>
+                                </article>
                     })
             }
-                </div> : <h2 className='center'>You have no posts yet.</h2>
+                </div> : <h2 className='center'>You are up to date!</h2>
             }
         </section>
     )

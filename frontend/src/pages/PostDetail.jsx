@@ -47,10 +47,12 @@ const PostDetail = () => {
             <div className="container post-detail_container">
                 <div className="post-detail_header">
                     <PostAuthor />
+                    {user.role !== 'Admin' && (
                     <div className="post-detail_buttons">
                         <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
-                        <button onClick={handleDelete} className="btn sm danger"> Delete </button>
+                        <button onClick={handleDelete} className="btn sm danger"> Delete </button>     
                     </div>
+                    )}
                 </div>
                 <h1>{post.title}</h1>
                 <div className="post-detail_image">
@@ -62,4 +64,4 @@ const PostDetail = () => {
     );
 };
 
-export default PostDetail;
+     export default PostDetail;

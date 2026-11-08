@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     postStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    rejectionReason: { type: String, default: '' },
 });
 
 module.exports = mongoose.model('Post', postSchema);

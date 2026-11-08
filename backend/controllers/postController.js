@@ -214,7 +214,7 @@ const moderatePost = async (req, res) => {
     //get the post ID and post status    
     try {
      const postId = req.params.id;
-     const { postStatus } = req.body;
+     const { postStatus, rejectionReason } = req.body;
 
         // Check if the user is an admin
         if (req.user.role !== 'Admin') {
@@ -224,12 +224,18 @@ const moderatePost = async (req, res) => {
         if (!['approved', 'rejected'].includes(postStatus)) {
                 return res.status(400).json({ message: 'Invalid post status' });
         }
+        // Add rejection reason
+        if (postStatus === 'rejected' && !rejectionReason) {
+        return res.status(400).json({ message: 'Rejection reason is required when rejecting a post' });
+    }
+
         //find the post and check it exists
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
-                post.postStatus = postStatus;
+                post.postStatus = postStatus
+                post.rejectionReason = postStatus === 'rejected' ? rejectionReason : '';
         //set the status and save
                 const updatedPost = await post.save();
         res.status(200).json(updatedPost);

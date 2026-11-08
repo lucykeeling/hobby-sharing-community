@@ -53,6 +53,10 @@ const Dashboard = () => {
                                 <h5>{post.title}</h5>
                                 </div>
                             <div className="dashboard_post-actions">
+                           <span className={`status-pill status-pill--${post.postStatus}`}
+                                title={post.postStatus === 'rejected' ? post.rejectionReason : undefined}>
+                                    {post.postStatus}
+                            </span>
                             <Link to ={`/post/${post._id}`} className="btn sm">View</Link>
                             <Link to ={`/post/${post._id}/edit`} className="btn sm primary">Edit</Link>
                             <button onClick={() => handleDelete(post._id)} className="btn sm danger"> Delete </button>
