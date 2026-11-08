@@ -10,6 +10,7 @@ import PostDetail from './pages/PostDetail';
 import Dashboard from './pages/Dashboard';
 import CategoryPosts from './pages/CategoryPosts';
 import EditPost from './pages/EditPost';
+import Moderate from './pages/Moderate';
 
 
 
@@ -27,6 +28,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/post/:id/edit" element={<EditPost />} />
         <Route path="/category/:category" element={<CategoryPosts />} />
+        <Route path="/moderate" element={<Moderate />} />
       </Routes>
       <Footer />
     </Router>

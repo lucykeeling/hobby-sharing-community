@@ -5,8 +5,18 @@ import { useAuth } from '../context/AuthContext';
 
 const Moderate = () => {
     const { user } = useAuth();
-    if (!user || user.role !== 'Admin') return <Navigate to ="/login" />;
-    return <div> Moderate Posts </div>
+    
+    if (!user) {
+        return (
+            <h2 className= 'center'>
+                Please <Link to ="/login">Log in</Link> to access this page.
+            </h2>
+        );
+    }
+    if (user.role !== 'Admin') {
+        return <h2 className='center'>You do not have permission to access this page.</h2>;
+    }
+    return <ModeratePosts />;   
 };
 
 const ModeratePosts = () => {
