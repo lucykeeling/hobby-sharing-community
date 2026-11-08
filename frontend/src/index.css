@@ -1,8 +1,8 @@
- @tailwind base;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
 
 :root {
     --primary-color: #6f6af8;
@@ -408,6 +408,41 @@ footer {
     background: var(--color-white);
     height: 8rem;
 }
+
+/*============Search Form ============*/
+.search_form {
+    width: var(--form-width);
+    margin-inline: auto;
+    background: var(--color-white);
+    padding: 1.2rem 2rem;
+    border-radius: var(--radius-3);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.search_form input {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-2);
+    background: var(--color-white);
+    color: var(--color-gray-900);
+    font: inherit;
+}
+
+.search_form input:focus {
+    border-color: var(--primary-color);
+}
+
+@media screen and (max-width: 1024px) {
+    .search_form {
+        width: var(--container-width-md);
+    }
+}
+
+
 
 /*============Register Form ============*/
 .register small, login small {

@@ -16,6 +16,7 @@ app.use(require('express-fileupload')());
 app.use('/api/posts', require('./routes/postRoutes'));
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
+
 // Export the app object for testing
 if (require.main === module) {
     connectDB();

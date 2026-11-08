@@ -17,7 +17,7 @@ const PostItem = ({ postID, category, title, description, creatorID, image }) =>
             <div dangerouslySetInnerHTML={{ __html: shortDescription }} />
             <div className="post_footer">
                 <PostAuthor />
-                <Link to={`/posts/categories/${category}`} className="btn category">
+                <Link to={`/search?q=${encodeURIComponent(category)}`} className="btn category">
                     {category}
                 </Link>
             </div>

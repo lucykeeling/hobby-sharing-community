@@ -79,6 +79,37 @@ const getPost = async (req, res) => {
     }
 };  
 
+// Get post by Category
+const getCatPosts = async (req, res) => {
+    try {
+        const { category } = req.params;
+        const catPosts = await Post.find({ category }).sort({ createdAt: -1 }).populate('creator', 'username');
+        res.status(200).json(catPosts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+// Search posts by title, description, or category
+const searchPosts = async (req, res) => {
+    try {
+        const { q } = req.query;        
+        const filter = { postStatus: 'approved' };
+
+        if (q && q.trim()) {
+            const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(escaped, 'i');  
+            filter.$or = [{ title: regex }, { description: regex }, { category: regex }];
+        }
+
+        const posts = await Post.find(filter).sort({ createdAt: -1 }).populate('creator', 'username');
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
 // Edit post
 const editPost = async (req, res) => {
     try {
@@ -168,7 +199,4 @@ const fileName = post.image
     }
 };
 
-
-
-
-module.exports = { createPost, getAllPosts, getUserPosts, getPost, editPost, deletePost };
+module.exports = { createPost, getAllPosts, getUserPosts, getPost, getCatPosts, searchPosts, editPost, deletePost };

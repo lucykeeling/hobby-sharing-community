@@ -24,7 +24,7 @@ const Header = () => {
                         <>
 
                         <li><Link to="/createpost" className="nav-links">Create Post</Link> </li>
-                        <li><Link to="/categories" className="nav-links">Browse by Category</Link> </li>
+                        <li><Link to="/search" className="nav-links">Search Posts</Link> </li>
                         <li><Link to ="/dashboard" className="nav-links">Dashboard</Link> </li>
 
                         {user.role === 'Admin' && (
