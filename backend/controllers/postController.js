@@ -49,7 +49,7 @@ const createPost = async (req, res) => {
 // Get all posts
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 }).populate('creator', 'username');
+        const posts = await Post.find( { postStatus: 'approved' }).sort({ createdAt: -1 }).populate('creator', 'username');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
