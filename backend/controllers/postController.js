@@ -3,6 +3,7 @@ const User = require('../models/User');
 const path = require('path');
 const { randomUUID } = require('crypto');
 const fs = require('fs');
+const Category = require('../models/Category');
 
 // Create a post
 const createPost = async (req, res) => {
@@ -49,7 +50,7 @@ const createPost = async (req, res) => {
 // Get all posts
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find( { postStatus: 'approved' }).sort({ createdAt: -1 }).populate('creator', 'username');
+        const posts = await Post.find( { postStatus: 'approved' }).sort({ createdAt: -1 }).populate('creator', 'name profileImage').populate('category', 'Category_name');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -58,7 +59,7 @@ const getAllPosts = async (req, res) => {
 // Get all pending posts
 const getAllPendingPosts = async (req, res) => {
     try {
-        const posts = await Post.find( { postStatus: 'pending' }).sort({ createdAt: -1 }).populate('creator', 'username');
+        const posts = await Post.find( { postStatus: 'pending' }).sort({ createdAt: -1 }).populate('creator', 'name profileImage');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -68,7 +69,7 @@ const getAllPendingPosts = async (req, res) => {
 // Get user's posts
 const getUserPosts = async (req, res) => {
     try {
-        const posts = await Post.find({ creator: req.user.id }).sort({ createdAt: -1 }).populate('creator', 'username');
+        const posts = await Post.find({ creator: req.user.id }).sort({ createdAt: -1 }).populate('creator', 'name profileImage');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -78,7 +79,7 @@ const getUserPosts = async (req, res) => {
 //Get a single post by ID
 const getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('creator', 'username');
+        const post = await Post.findById(req.params.id).populate('creator', 'name profileImage').populate('category', 'Category_name');
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
@@ -92,7 +93,7 @@ const getPost = async (req, res) => {
 const getCatPosts = async (req, res) => {
     try {
         const { category } = req.params;
-        const catPosts = await Post.find({ category, postStatus: 'approved' }).sort({ createdAt: -1 }).populate('creator', 'username', 'category', 'Category_name');
+        const catPosts = await Post.find({ category, postStatus: 'approved' }).sort({ createdAt: -1 }).populate('creator', 'name profileImage').populate('category', 'Category_name');
         res.status(200).json(catPosts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -106,11 +107,17 @@ const searchPosts = async (req, res) => {
 
         if (q && q.trim()) {
             const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(escaped, 'i');  
-            filter.$or = [{ title: regex }, { description: regex }, { category: regex }];
-        }
+            const regex = new RegExp(escaped, 'i');    
+            const matchingCats = await Category.find({ Category_name: regex }).select('_id');
+            const catIds = matchingCats.map((c) => c._id);
 
-        const posts = await Post.find(filter).sort({ createdAt: -1 }).populate('creator', 'username', 'category', 'Category_name');
+            filter.$or = [
+                { title: regex },
+                { description: regex },
+                { category: { $in: catIds } },
+            ];
+        }
+        const posts = await Post.find(filter).sort({ createdAt: -1 }).populate('creator', 'name profileImage').populate('category', 'Category_name');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -164,6 +171,10 @@ const editPost = async (req, res) => {
             // point the post at the new image
             post.image = newFileName;
         }
+
+        post.postStatus = 'pending';
+        post.rejectionReason = '';
+        post.updatedAt = Date.now();
 
         // Save the updated post
         const updatedPost = await post.save();

@@ -24,15 +24,15 @@ const CategoryResults = () => {
 
             {posts.length > 0 ? <div className="container post_container">
                     {
-                        posts.map(({_id, title, description, image, creator, date, category}) =>
+                        posts.map(({_id, title, description, image, creator, createdAt, category}) =>
                             <PostItem
                                 key={_id}
                                 postID={_id}
                                 title={title}
                                 description={description}
                                 image={`http://localhost:5001/uploads/${image}`}
-                                creator={creator?._id}
-                                date={date}
+                                creator={creator}
+                                createdAt={createdAt}
                                 category={category} />
                                 )
                     }

@@ -13,7 +13,7 @@ const Login = () => {
     try {
       const response = await axiosInstance.post('/api/auth/login', formData);
       login(response.data);
-      navigate('/tasks');
+      navigate('/Dashboard');
     } catch (error) {
       alert('Login failed. Please try again.');
     }
@@ -40,7 +40,7 @@ const Login = () => {
         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
           Login
         </button>
-        <small className="text-center text-sm text-gray-500">
+        <small className="text-center text-sm text-gray-500btn">
           Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
         </small>
       </form>

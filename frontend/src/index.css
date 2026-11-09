@@ -225,6 +225,25 @@ footer {
     font-weight: 300;
 }
 
+
+
+/*============Home Page============*/
+.home {
+    display: grid;
+    place-items: center;
+    height: 80vh;
+}
+
+.home-content {
+    text-align: center;
+}
+
+.home-image {
+    width: 90%;
+    max-width: 1200px;
+    margin-top: 2rem;
+}
+
 /*============POSTS============*/
 
 .post_container {
@@ -249,8 +268,14 @@ footer {
 .post_image {
     border-radius: var(--radius-3);
     overflow: hidden;
-    height: 16rem;  
+    height: 16rem;
 }
+.post_image img {
+    height: 100%;
+    object-fit: contain;
+    background: #f3f3f3;
+}
+
 
 .post_content {
     margin-top: 1.5rem;
@@ -301,11 +326,17 @@ footer {
 }
 
 .post-detail_image {
+    object-fit: contain;
     margin: 1rem 0;
-    height: fit-content;
     max-height: 30rem;
     overflow: hidden;
 }
+
+.post-detail_image img {
+    max-height: 30rem;
+    object-fit: contain;
+}
+
 
 .post-detail p {
     margin-bottom: 0.7rem;

@@ -4,11 +4,11 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CreatePost from './pages/CreatePost';
 import Home from './pages/Home';
-import Header from './pages/Header';
-import Footer from './pages/Footer';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import PostDetail from './pages/PostDetail';
 import Dashboard from './pages/Dashboard';
-import CategoryPosts from './pages/CategoryPosts';
+import Search from './pages/Search';
 import EditPost from './pages/EditPost';
 import Moderate from './pages/Moderate';
 import CategoryResults from './pages/CategoryResults';
@@ -29,7 +29,7 @@ function App() {
         <Route path="/post/:id" element={<PostDetail />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/post/:id/edit" element={<EditPost />} />
-        <Route path="/search" element={<CategoryPosts />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/moderate" element={<Moderate />} />
         <Route path="/category/:id" element={<CategoryResults />} />
         <Route path="/settings" element={<Settings />} />

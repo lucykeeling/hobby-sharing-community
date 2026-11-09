@@ -68,7 +68,7 @@ const CreatePost = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            navigate('/');
+            navigate('/Dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Could not create post');
         }

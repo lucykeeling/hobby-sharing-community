@@ -1,18 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import Avatar from '../images/avatar.png';
 
-const PostAuthor = () => {
+const PostAuthor = ({ creator, createdAt }) => {
     return (
-        <Link to={`/posts/authors/name`} className="post_author">
+        <div className="post_author">
             <div className="post_author-avatar">
-            <img src={Avatar} alt="" />
+            <img src={
+creator?.profileImage ? `http://localhost:5001/uploads/${creator.profileImage}` : Avatar    
+                
+            } alt="" />
             </div>
             <div className="post_author-details">
-                <h5>By: Lucy Keeling</h5>
-                <small>Just now</small>
+                <h5>By: {creator?.name || 'Unknown'}</h5>
+                <small>{createdAt ? new Date(createdAt).toLocaleString() : 'Unknown Date'}</small>
             </div>
-        </Link>
+        </div>
     )
 }
 export default PostAuthor

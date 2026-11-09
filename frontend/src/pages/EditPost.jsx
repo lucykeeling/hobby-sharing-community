@@ -53,7 +53,7 @@ const EditPost = () => {
             try {
                 const response = await axiosInstance.get(`/api/posts/${id}`);
                 setTitle(response.data.title);
-                setCategory(response.data.category);
+                setCategory(response.data.category?._id || response.data.category);
                 setDescription(response.data.description);
                 setCurrentImage(response.data.image);
             } catch (err) {

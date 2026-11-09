@@ -41,18 +41,24 @@ const PostDetail = () => {
     if (!post) {
         return <h2 className="center">Loading...</h2>;
     }
+    
+        const isOwner = user && post && user.id === post.creator?._id;
 
     return (
         <section className="post-detail">
             <div className="container post-detail_container">
                 <div className="post-detail_header">
-                    <PostAuthor />
-                    {user.role !== 'Admin' && (
+                    <PostAuthor creator={post.creator} createdAt={post.createdAt} />
                     <div className="post-detail_buttons">
-                        <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
-                        <button onClick={handleDelete} className="btn sm danger"> Delete </button>     
+                        <button onClick={() => navigate(-1)} className="btn sm primary">Back</button>
+
+                        {isOwner && (
+                            <>
+                                <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
+                                <button onClick={handleDelete} className="btn sm danger">Delete</button>
+                            </>
+                        )}
                     </div>
-                    )}
                 </div>
                 <h1>{post.title}</h1>
                 <div className="post-detail_image">
