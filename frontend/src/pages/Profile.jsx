@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import Avatar from '../images/avatar.png';
+import { API_URL } from '../config';
 
 
 const Profile = () => {
@@ -79,7 +80,7 @@ const Profile = () => {
       image
         ? URL.createObjectURL(image)
         : formData.profileImage
-        ? `http://localhost:5001/uploads/${formData.profileImage}`
+        ? `${API_URL}/uploads/${formData.profileImage}`
         : Avatar  
     }
     alt="Profile"

@@ -4,6 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 const EditPost = () => {
     const { id } = useParams();
@@ -109,7 +110,7 @@ const EditPost = () => {
                     </select>
                     <ReactQuill modules={modules} formats={formats} value={description} onChange={setDescription} placeholder="Description" className="q1-editor" />
                     {currentImage && (
-                        <img src={`http://localhost:5001/uploads/${currentImage}`} alt={title} style={{ maxWidth: '200px' }} />
+                        <img src={`${API_URL}/uploads/${currentImage}`} alt={title} style={{ maxWidth: '200px' }} />
                     )}
                     <input type="file" onChange={(e) => setImage(e.target.files[0])} accept="image/png, image/jpeg" />
                     <button type="submit" className="btn primary">Update</button>
