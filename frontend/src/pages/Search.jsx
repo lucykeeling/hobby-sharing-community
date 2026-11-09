@@ -2,6 +2,7 @@ import React from 'react';
 import PostItem from '../components/PostItem';
 import axiosInstance from '../axiosConfig';
 import { useSearchParams } from 'react-router-dom';
+import { API_URL } from '../config';
 
 const Search = () => {
     const [posts, setPosts] = React.useState([]);
@@ -61,7 +62,7 @@ const Search = () => {
                                 postID={_id}
                                 title={title}
                                 description={description}
-                                image={`http://localhost:5001/uploads/${image}`}
+                                image={`${API_URL}/uploads/${image}`}
                                 creator={creator}
                                 createdAt={createdAt}
                                 category={category} />

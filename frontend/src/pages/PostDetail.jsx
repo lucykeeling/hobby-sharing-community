@@ -3,6 +3,7 @@ import PostAuthor from '../components/PostAuthor';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 
 const PostDetail = () => {
@@ -62,7 +63,7 @@ const PostDetail = () => {
                 </div>
                 <h1>{post.title}</h1>
                 <div className="post-detail_image">
-                    <img src={`http://localhost:5001/uploads/${post.image}`} alt={post.title} />
+                    <img src={`${API_URL}/uploads/${post.image}`} alt={post.title} />
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: post.description }} />
             </div>
