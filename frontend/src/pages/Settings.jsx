@@ -12,7 +12,6 @@ const Settings = () => {
 
     const authConfig = { headers: { Authorization: `Bearer ${user?.token}` } };
 
-    // Load the existing categories into the form
     React.useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -27,15 +26,15 @@ const Settings = () => {
 
 
         const startAdd = () => {
-        setEditingId(null);   // null = adding
+        setEditingId(null);  
         setName('');
         setError('');
         setShowForm(true);
     };
 
     const startEdit = (cat) => {
-        setEditingId(cat._id);          // remember WHICH one
-        setName(cat.Category_name);     // pre-fill the box
+        setEditingId(cat._id);          
+        setName(cat.Category_name);     
         setError('');
         setShowForm(true);
     };
@@ -47,7 +46,6 @@ const Settings = () => {
     };
 
 
-    // Send the changes to the backend
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -85,7 +83,6 @@ const Settings = () => {
     };
 
 
-//Frontend
      if (user?.role !== 'Admin') {
         return <h2 className="center">Admins only.</h2>;
     }

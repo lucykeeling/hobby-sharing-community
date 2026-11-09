@@ -10,14 +10,14 @@ const Search = () => {
     const [query, setQuery] = React.useState(searchParams.get('q') || '');
     const [searchText, setSearchText] = React.useState(query);
 
-    // Effect 1: keep the search box in sync with the URL (?q=...)
+
     React.useEffect(() => {
         const q = searchParams.get('q') || '';
         setQuery(q);
         setSearchText(q);
     }, [searchParams]);
 
-    // Effect 2: fetch results whenever the query changes
+
     React.useEffect(() => {
         if (!query) {         
             setPosts([]);

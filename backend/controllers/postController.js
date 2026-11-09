@@ -16,20 +16,16 @@ const createPost = async (req, res) => {
 
         const { image } = req.files;
 
-        // check the file size
         if (image.size > 2000000) {
             return res.status(422).json({ message: 'File size should be less than 2MB' });
         }
 
-        // give the file a unique name
         const parts = image.name.split('.');
         const extension = parts[parts.length - 1];
         const newFileName = parts[0] + randomUUID() + '.' + extension;
 
-        // save the file into the uploads folder
         await image.mv(path.join(__dirname, '../uploads/', newFileName));
 
-        // save the post to the database
         const newPost = await Post.create({
             title,
             category,
@@ -38,7 +34,6 @@ const createPost = async (req, res) => {
             creator: req.user.id,
         });
 
-        // increase the user's post count by 1
         await User.findByIdAndUpdate(req.user.id, { $inc: { postCount: 1 } });
 
         res.status(201).json(newPost);
@@ -131,44 +126,36 @@ const editPost = async (req, res) => {
         const { title, category, description } = req.body;
         const postId = req.params.id;
 
-        // Find the post by ID
         const post = await Post.findById(postId);
 
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Check if the user is the owner of the post
         if (post.creator.toString() !== req.user.id) {
             return res.status(403).json({ message: 'You are not the owner of this post' });
         }
 
-        // Update the text fields
         post.title = title;
         post.category = category;
         post.description = description;
 
-        // Only runs if a new image was uploaded
         if (req.files && req.files.image) {
             const { image } = req.files;
 
-            // check the file size
             if (image.size > 2000000) {
                 return res.status(422).json({ message: 'File size should be less than 2MB' });
             }
 
-            // delete the old image from the uploads folder
             fs.unlink(path.join(__dirname, '../uploads/', post.image), (err) => {
                 if (err) console.error('Could not delete old image', err);
             });
 
-            // give the new file a unique name and save it
             const parts = image.name.split('.');
             const extension = parts[parts.length - 1];
             const newFileName = parts[0] + randomUUID() + '.' + extension;
             await image.mv(path.join(__dirname, '../uploads/', newFileName));
 
-            // point the post at the new image
             post.image = newFileName;
         }
 
@@ -176,7 +163,6 @@ const editPost = async (req, res) => {
         post.rejectionReason = '';
         post.updatedAt = Date.now();
 
-        // Save the updated post
         const updatedPost = await post.save();
 
         res.status(200).json(updatedPost);
@@ -200,13 +186,12 @@ const deletePost = async (req, res) => {
 
 const fileName = post.image
 
-        //delete image from uploads folder
         fs.unlink(path.join(__dirname, '../uploads/', fileName), async (err) => {
             if (err) {
                 return res.status(500).json({ message: 'Could not delete image file' });
             } else {
                 await Post.findByIdAndDelete(postId);
-                //find user and reduce postCount by 1
+               
                 const currentUser = await User.findById(req.user.id);
                 const userPostCount = currentUser.postCount > 0 ? currentUser.postCount - 1 : 0;
                 await User.findByIdAndUpdate(req.user.id, { postCount: userPostCount });
@@ -222,32 +207,30 @@ const fileName = post.image
 
 // Moderate Posts
 const moderatePost = async (req, res) => {
-    //get the post ID and post status    
+ 
     try {
      const postId = req.params.id;
      const { postStatus, rejectionReason } = req.body;
 
-        // Check if the user is an admin
         if (req.user.role !== 'Admin') {
             return res.status(403).json({ message: 'You do not have permission to moderate posts' });
         }
-        // Validate the post status
+
         if (!['approved', 'rejected'].includes(postStatus)) {
                 return res.status(400).json({ message: 'Invalid post status' });
         }
-        // Add rejection reason
+
         if (postStatus === 'rejected' && !rejectionReason) {
         return res.status(400).json({ message: 'Rejection reason is required when rejecting a post' });
     }
 
-        //find the post and check it exists
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
                 post.postStatus = postStatus
                 post.rejectionReason = postStatus === 'rejected' ? rejectionReason : '';
-        //set the status and save
+     
                 const updatedPost = await post.save();
         res.status(200).json(updatedPost);
     } catch (error) {
