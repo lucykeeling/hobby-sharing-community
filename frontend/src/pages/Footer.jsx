@@ -1,21 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axiosInstance from '../axiosConfig';
 
 const Footer = () => {
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axiosInstance.get('/api/categories');
+                setCategories(response.data);
+            } catch (err) {
+                console.error('Could not load categories', err);
+            }
+        };
+        fetchCategories();
+    }, []);
+
     return (
         <footer>
-            <ul className = "footer_categories">
-                <li><Link to="/posts/categories/Gardening">Gardening</Link></li>
-                <li><Link to="/posts/categories/Crocheting">Crocheting</Link></li>
-                <li><Link to="/posts/categories/Exercise">Exercise</Link></li>
-                <li><Link to="/posts/categories/Chess">Chess</Link></li>
-                <li><Link to="/posts/categories/Collecting">Collecting</Link></li>
+            <ul className="footer_categories">
+                {categories.map((cat) => (
+                    <li key={cat._id}>
+                        <Link to={`/category/${cat._id}`}>{cat.Category_name}</Link>
+                    </li>
+                ))}
             </ul>
             <div className="footer_copyright">
                 <small> All Rights Reserved &copy; Copyright, Lucy Keeling n810251.</small>
             </div>
         </footer>
     );
-}   
+};
 
 export default Footer;

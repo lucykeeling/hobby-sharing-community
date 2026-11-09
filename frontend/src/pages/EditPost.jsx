@@ -9,9 +9,9 @@ const EditPost = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-
     const [title, setTitle] = useState('');
-    const [category, setCategory] = useState('Gardening');
+    const [category, setCategory] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null);
     const [currentImage, setCurrentImage] = useState('');
@@ -34,7 +34,18 @@ const EditPost = () => {
         'link', 'image'
     ];
 
-    const Post_CATEGORIES = ['Gardening', 'Crochet', 'Exercise', 'Chess', 'Collecting', 'Cooking', 'Music', 'Travel', 'Drawing', 'DIY'];
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axiosInstance.get('/api/categories');
+                    setCategories(response.data);
+            } catch (err) {
+                setError('Could not load categories');
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     // Load the existing post into the form
     useEffect(() => {
@@ -92,9 +103,9 @@ const EditPost = () => {
                 <form onSubmit={handleSubmit} className="form create-post_form">
                     <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
                     <select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                        {
-                            Post_CATEGORIES.map((cat, index) => <option key={index} value={cat}>{cat}</option>)
-                        }
+                        <option value =""> Select a category </option>
+                        {categories.map((cat) => (<option key={cat._id} value={cat._id}>{cat.Category_name}</option>
+                        ))}
                     </select>
                     <ReactQuill modules={modules} formats={formats} value={description} onChange={setDescription} placeholder="Description" className="q1-editor" />
                     {currentImage && (

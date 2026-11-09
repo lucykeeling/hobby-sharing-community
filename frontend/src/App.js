@@ -11,6 +11,8 @@ import Dashboard from './pages/Dashboard';
 import CategoryPosts from './pages/CategoryPosts';
 import EditPost from './pages/EditPost';
 import Moderate from './pages/Moderate';
+import CategoryResults from './pages/CategoryResults';
+import Settings from './pages/Settings';
 
 
 
@@ -29,6 +31,8 @@ function App() {
         <Route path="/post/:id/edit" element={<EditPost />} />
         <Route path="/search" element={<CategoryPosts />} />
         <Route path="/moderate" element={<Moderate />} />
+        <Route path="/category/:id" element={<CategoryResults />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
       <Footer />
     </Router>

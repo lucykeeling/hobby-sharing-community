@@ -1,4 +1,4 @@
-const Post = require('../models/Post');
+const Post = require('../models/post');
 const User = require('../models/User');
 const path = require('path');
 const { randomUUID } = require('crypto');
@@ -92,7 +92,7 @@ const getPost = async (req, res) => {
 const getCatPosts = async (req, res) => {
     try {
         const { category } = req.params;
-        const catPosts = await Post.find({ category }).sort({ createdAt: -1 }).populate('creator', 'username');
+        const catPosts = await Post.find({ category, postStatus: 'approved' }).sort({ createdAt: -1 }).populate('creator', 'username', 'category', 'Category_name');
         res.status(200).json(catPosts);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -110,7 +110,7 @@ const searchPosts = async (req, res) => {
             filter.$or = [{ title: regex }, { description: regex }, { category: regex }];
         }
 
-        const posts = await Post.find(filter).sort({ createdAt: -1 }).populate('creator', 'username');
+        const posts = await Post.find(filter).sort({ createdAt: -1 }).populate('creator', 'username', 'category', 'Category_name');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
