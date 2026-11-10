@@ -59,6 +59,7 @@ const ModeratePosts = () => {
             {headers: { Authorization: `Bearer ${user.token}` },
             });
             setPosts(posts.filter(post => post._id !== postId));
+            alert (status === 'approved' ? 'Post approved successfully' : 'Post rejected successfully');
             } catch (error) {
             console.error('Error moderating post:', error);
             }
