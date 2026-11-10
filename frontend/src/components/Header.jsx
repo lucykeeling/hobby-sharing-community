@@ -15,11 +15,11 @@ const Header = () => {
 
         <nav>
             <div className="nav_container">
-                <Link to="/" className="nav_logo">
+                <Link to="/posts" className="nav_logo">
                     <img src={logo} alt="Navbar Logo" />    
                     </Link>
                 <ul className="nav_menu">
-                    <li><Link to="/" className="nav-links">Home</Link> </li>
+                    <li><Link to="/posts" className="nav-links">Home</Link> </li>
                     {user ? (
                         <>
 

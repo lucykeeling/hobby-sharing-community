@@ -13,6 +13,7 @@ import EditPost from './pages/EditPost';
 import Moderate from './pages/Moderate';
 import CategoryResults from './pages/CategoryResults';
 import Settings from './pages/Settings';
+import Posts from './pages/Posts';
 
 
 
@@ -33,6 +34,7 @@ function App() {
         <Route path="/moderate" element={<Moderate />} />
         <Route path="/category/:id" element={<CategoryResults />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/posts" element={<Posts />} />
       </Routes>
       <Footer />
     </Router>
