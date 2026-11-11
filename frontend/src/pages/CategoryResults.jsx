@@ -3,15 +3,18 @@ import PostItem from '../components/PostItem';
 import axiosInstance from '../axiosConfig';
 import { useParams } from 'react-router-dom';
 import { API_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
 
 const CategoryResults = () => {
     const [posts, setPosts] = React.useState([]);
     const { id } = useParams();
+    const { user } = useAuth();
 
     React.useEffect(() => {
+         if (!user) return;
         const fetchPosts = async () => {
             try {
-                const response = await axiosInstance.get(`/api/posts/category/${id}`);
+                const response = await axiosInstance.get(`/api/posts/category/${id}`, {headers: { Authorization: `Bearer ${ user.token }` }});
                 setPosts(response.data);
             } catch (error) {
                 console.error('Error loading category posts:', error);

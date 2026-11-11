@@ -35,7 +35,7 @@ if (!user) return <Navigate to="/login" />;
                         title={title} 
                         description={description} 
                         image={`${API_URL}/uploads/${image}`}
-                        creator={creator?._id} 
+                        creator={creator} 
                         createdAt={createdAt} 
                         category={category} />              )
                 }

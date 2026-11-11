@@ -13,10 +13,13 @@ const PostDetail = () => {
     const navigate = useNavigate();
  
 
-    useEffect(() => {
+    React.useEffect(() => {
+        if (!user) return;
         const fetchPost = async () => {
             try {
-                const response = await axiosInstance.get(`/api/posts/${id}`);
+                const response = await axiosInstance.get(`/api/posts/${id}`, {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                });
                 setPost(response.data);
             } catch (error) {
                 console.error('Failed to fetch post', error);
