@@ -14,7 +14,7 @@ import Moderate from './pages/Moderate';
 import CategoryResults from './pages/CategoryResults';
 import Settings from './pages/Settings';
 import Posts from './pages/Posts';
-
+import ErrorPage from './pages/ErrorPage';
 
 
 function App() {
@@ -35,6 +35,7 @@ function App() {
         <Route path="/category/:id" element={<CategoryResults />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/posts" element={<Posts />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer />
     </Router>
