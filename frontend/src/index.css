@@ -201,6 +201,7 @@ footer {
     justify-content: center;
     gap: 1.5rem;
     margin-bottom: 4rem;
+    flex-wrap: wrap;
 }
 
 .footer_categories a {
@@ -224,6 +225,25 @@ footer {
     font-weight: 300;
 }
 
+
+
+/*============Home Page============*/
+.home {
+    display: grid;
+    place-items: center;
+    height: 80vh;
+}
+
+.home-content {
+    text-align: center;
+}
+
+.home-image {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 2rem;
+}
+
 /*============POSTS============*/
 
 .post_container {
@@ -233,6 +253,8 @@ footer {
 }
 
 .post {
+    display: flex;
+    flex-direction: column;
     background: var(--color-white);
     padding: 1rem;
     border-radius: var(--radius-4);
@@ -248,11 +270,20 @@ footer {
 .post_image {
     border-radius: var(--radius-3);
     overflow: hidden;
-    height: 16rem;  
+    height: 16rem;
 }
+.post_image img {
+    height: 100%;
+    object-fit: contain;
+    background: #f3f3f3;
+}
+
 
 .post_content {
     margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .post_content h3 {
@@ -263,7 +294,8 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-top: 2rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 .post_author{
@@ -300,11 +332,17 @@ footer {
 }
 
 .post-detail_image {
+    object-fit: contain;
     margin: 1rem 0;
-    height: fit-content;
     max-height: 30rem;
     overflow: hidden;
 }
+
+.post-detail_image img {
+    max-height: 30rem;
+    object-fit: contain;
+}
+
 
 .post-detail p {
     margin-bottom: 0.7rem;
@@ -478,4 +516,57 @@ footer {
 
 .error-page .btn {
     margin-top: 1.5rem;
+
+/*============Rejection Modal ============*/
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/*============Status Pills ============*/
+.status-pill {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    text-align: center;
+    line-height: 1.7;
+    min-width: 5.5rem;
+}
+.status-pill--pending  { 
+    background: #a8bdeb; 
+    color: #1c27c2; 
+}
+.status-pill--approved { 
+    background: #d4edda; 
+    color: #155724; 
+}
+.status-pill--rejected { 
+    background: #f8d7da; 
+    color: #721c24; 
+    cursor: help; 
 }

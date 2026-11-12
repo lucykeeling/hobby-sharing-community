@@ -3,6 +3,7 @@ import PostAuthor from '../components/PostAuthor';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 
 const PostDetail = () => {
@@ -12,10 +13,13 @@ const PostDetail = () => {
     const navigate = useNavigate();
  
 
-    useEffect(() => {
+    React.useEffect(() => {
+        if (!user) return;
         const fetchPost = async () => {
             try {
-                const response = await axiosInstance.get(`/api/posts/${id}`);
+                const response = await axiosInstance.get(`/api/posts/${id}`, {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                });
                 setPost(response.data);
             } catch (error) {
                 console.error('Failed to fetch post', error);
@@ -41,20 +45,28 @@ const PostDetail = () => {
     if (!post) {
         return <h2 className="center">Loading...</h2>;
     }
+    
+        const isOwner = user && post && user.id === post.creator?._id;
 
     return (
         <section className="post-detail">
             <div className="container post-detail_container">
                 <div className="post-detail_header">
-                    <PostAuthor />
+                    <PostAuthor creator={post.creator} createdAt={post.createdAt} />
                     <div className="post-detail_buttons">
-                        <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
-                        <button onClick={handleDelete} className="btn sm danger"> Delete </button>
+                        <button onClick={() => navigate(-1)} className="btn sm primary">Back</button>
+
+                        {isOwner && (
+                            <>
+                                <Link to={`/post/${id}/edit`} className="btn sm primary">Edit</Link>
+                                <button onClick={handleDelete} className="btn sm danger">Delete</button>
+                            </>
+                        )}
                     </div>
                 </div>
                 <h1>{post.title}</h1>
                 <div className="post-detail_image">
-                    <img src={`http://localhost:5001/uploads/${post.image}`} alt={post.title} />
+                    <img src={`${API_URL}/uploads/${post.image}`} alt={post.title} />
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: post.description }} />
             </div>
@@ -62,4 +74,4 @@ const PostDetail = () => {
     );
 };
 
-export default PostDetail;
+     export default PostDetail;

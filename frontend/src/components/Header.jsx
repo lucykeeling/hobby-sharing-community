@@ -15,11 +15,11 @@ const Header = () => {
 
         <nav>
             <div className="nav_container">
-                <Link to="/" className="nav_logo">
+                <Link to= {user ? "/posts" :  "/"} className="nav_logo">
                     <img src={logo} alt="Navbar Logo" />    
                     </Link>
                 <ul className="nav_menu">
-                    <li><Link to="/" className="nav-links">Home</Link> </li>
+                    <li><Link to= {user ? "/posts" :  "/"} className="nav-links">Home</Link> </li>
                     {user ? (
                         <>
 
@@ -28,9 +28,12 @@ const Header = () => {
                         <li><Link to ="/dashboard" className="nav-links">Dashboard</Link> </li>
 
                         {user.role === 'Admin' && (
+                            <>
                         <li><Link to="/moderate" className="nav-links">Moderate Posts</Link> </li>
-                        )}
-
+                        <li><Link to="/settings" className="nav-links">Settings</Link> </li>
+                        
+                    </>)
+                        }
 
                         <li><Link to="/profile" className="nav-links">Profile</Link> </li>
                         <li><button onClick={handleLogout} className="nav-links">Logout</button></li>

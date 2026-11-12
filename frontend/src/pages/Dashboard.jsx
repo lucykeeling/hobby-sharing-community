@@ -2,6 +2,7 @@ import React from 'react';
 import { Link , useNavigate } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 
 const Dashboard = () => {
@@ -48,11 +49,15 @@ const Dashboard = () => {
                             return <article key={post._id} className="dashboard_post">
                                 <div className="dashboard_post-info">
                                 <div className="dashboard_post-image">
-                                    <img src={`http://localhost:5001/uploads/${post.image}`} alt={post.title} />
+                                    <img src={`${API_URL}/uploads/${post.image}`} alt={post.title} />
                                     </div>
                                 <h5>{post.title}</h5>
                                 </div>
                             <div className="dashboard_post-actions">
+                           <span className={`status-pill status-pill--${post.postStatus}`}
+                                title={post.postStatus === 'rejected' ? post.rejectionReason : undefined}>
+                                    {post.postStatus}
+                            </span>
                             <Link to ={`/post/${post._id}`} className="btn sm">View</Link>
                             <Link to ={`/post/${post._id}/edit`} className="btn sm primary">Edit</Link>
                             <button onClick={() => handleDelete(post._id)} className="btn sm danger"> Delete </button>

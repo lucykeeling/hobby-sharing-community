@@ -4,14 +4,15 @@ import 'react-quill/dist/quill.snow.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 
 const EditPost = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-
     const [title, setTitle] = useState('');
-    const [category, setCategory] = useState('Gardening');
+    const [category, setCategory] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null);
     const [currentImage, setCurrentImage] = useState('');
@@ -34,7 +35,18 @@ const EditPost = () => {
         'link', 'image'
     ];
 
-    const Post_CATEGORIES = ['Gardening', 'Crochet', 'Exercise', 'Chess', 'Collecting', 'Cooking', 'Music', 'Travel', 'Drawing', 'DIY'];
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axiosInstance.get('/api/categories');
+                    setCategories(response.data);
+            } catch (err) {
+                setError('Could not load categories');
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     // Load the existing post into the form
     useEffect(() => {
@@ -42,7 +54,7 @@ const EditPost = () => {
             try {
                 const response = await axiosInstance.get(`/api/posts/${id}`);
                 setTitle(response.data.title);
-                setCategory(response.data.category);
+                setCategory(response.data.category?._id || response.data.category);
                 setDescription(response.data.description);
                 setCurrentImage(response.data.image);
             } catch (err) {
@@ -92,13 +104,13 @@ const EditPost = () => {
                 <form onSubmit={handleSubmit} className="form create-post_form">
                     <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
                     <select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                        {
-                            Post_CATEGORIES.map((cat, index) => <option key={index} value={cat}>{cat}</option>)
-                        }
+                        <option value =""> Select a category </option>
+                        {categories.map((cat) => (<option key={cat._id} value={cat._id}>{cat.Category_name}</option>
+                        ))}
                     </select>
                     <ReactQuill modules={modules} formats={formats} value={description} onChange={setDescription} placeholder="Description" className="q1-editor" />
                     {currentImage && (
-                        <img src={`http://localhost:5001/uploads/${currentImage}`} alt={title} style={{ maxWidth: '200px' }} />
+                        <img src={`${API_URL}/uploads/${currentImage}`} alt={title} style={{ maxWidth: '200px' }} />
                     )}
                     <input type="file" onChange={(e) => setImage(e.target.files[0])} accept="image/png, image/jpeg" />
                     <button type="submit" className="btn primary">Update</button>

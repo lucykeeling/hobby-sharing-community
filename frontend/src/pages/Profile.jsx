@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
+import Avatar from '../images/avatar.png';
+import { API_URL } from '../config';
+
 
 const Profile = () => {
   const { user } = useAuth(); // Access user token from context
@@ -9,7 +12,9 @@ const Profile = () => {
     email: '',
     role: '',
     postCount: '',
+    profileImage: '',
   });
+  const [image, setImage] = useState(null);   
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -25,6 +30,7 @@ const Profile = () => {
           name: response.data.name,
           email: response.data.email,
           role: response.data.role,
+          profileImage: response.data.profileImage,
         });
         setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
@@ -41,8 +47,16 @@ const Profile = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axiosInstance.put('/api/auth/profile', formData, {
-        headers: { Authorization: `Bearer ${user.token}` },
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('email', formData.email);
+      data.append('role', formData.role);
+      if (image) {
+        data.append('profileImage', image);
+      }
+
+      await axiosInstance.put('/api/auth/profile', data, {
+        headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' },
       });
       alert('Profile updated successfully!');
     } catch (error) {
@@ -60,6 +74,19 @@ const Profile = () => {
     <div className="max-w-md mx-auto mt-20">
       <form onSubmit={handleSubmit} className="form bg-white p-6 rounded shadow-md">
         <h1 className="text-2xl font-bold text-center">Your Profile</h1>
+
+          <img
+    src={
+      image
+        ? URL.createObjectURL(image)
+        : formData.profileImage
+        ? `${API_URL}/uploads/${formData.profileImage}`
+        : Avatar  
+    }
+    alt="Profile"
+    className="profile-image mb-4"
+  />
+  
         <input 
           type="text"
           placeholder="Name"
@@ -74,6 +101,12 @@ const Profile = () => {
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className = "profile-input mb-4"
         />
+        <input 
+        type="file" 
+        onChange={(e) => setImage(e.target.files[0])} 
+        accept="image/png, image/jpeg" />
+
+
         {isAdmin && (
           <fieldset>
             <legend className="mb-2 font-semibold">Role</legend>

@@ -1,9 +1,14 @@
-import React from 'react';
-import Posts from './Posts';
+import home from '../images/home.png';
 
 const Home  = () => {
     return (
-        <Posts />
+        <section className="home">
+
+        <h2> Welcome to the Hobby Sharing Community</h2>
+        <div>
+        <img src={home} alt="Hobby Sharing Community" className="home-image" />
+        </div>
+        </section>
     )
 }
 

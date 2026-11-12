@@ -7,7 +7,8 @@ import axiosInstance from '../axiosConfig';
 
 const CreatePost = () => {
     const [title, setTitle] = React.useState('');
-    const [category, setCategory] = React.useState('Gardening');
+    const [category, setCategory] = React.useState('');
+    const [categories, setCategories] = React.useState([]);
     const [description, setDescription] = React.useState('');
     const [image, setImage] = React.useState(null);
     const [error, setError] = React.useState('');
@@ -32,7 +33,18 @@ const CreatePost = () => {
         'link', 'image'
     ];
 
-    const Post_CATEGORIES = ['Gardening', 'Crochet', 'Exercise', 'Chess', 'Collecting', 'Cooking', 'Music', 'Travel', 'Drawing', 'DIY'];
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axiosInstance.get('/api/categories');
+                    setCategories(response.data);
+            } catch (err) {
+                setError('Could not load categories');
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -56,7 +68,7 @@ const CreatePost = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            navigate('/');
+            navigate('/Dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Could not create post');
         }
@@ -70,9 +82,9 @@ const CreatePost = () => {
                 <form onSubmit={handleSubmit} className="form create-post_form">
                     <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
                     <select name="category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                        {
-                            Post_CATEGORIES.map((category, index) => <option key={index} value={category}>{category}</option>)
-                        }
+                        <option value =""> Select a category </option>
+                        {categories.map((cat) => (<option key={cat._id} value={cat._id}>{cat.Category_name}</option>
+                        ))}
                     </select>
                     <ReactQuill modules={modules} formats={formats} value={description} onChange={setDescription} placeholder="Description" className="q1-editor" />
                     <input type="file" onChange={(e) => setImage(e.target.files[0])} accept="image/png, image/jpeg" />
