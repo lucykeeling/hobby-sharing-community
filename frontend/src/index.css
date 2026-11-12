@@ -468,3 +468,14 @@ footer {
 .profile-input:focus {
     border-color: var(--primary-color);
 }
+
+/*============Error Page ============*/
+
+.error-page h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-page .btn {
+    margin-top: 1.5rem;
+}
