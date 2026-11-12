@@ -20,9 +20,6 @@ Built by Lucy Keeling (n8102571) for IFQ636 at QUTOnline, extending the starter 
 
 ## 🚀 Usage
 
-![Home page](docs/screenshots/home.png)
-![Admin moderation](docs/screenshots/moderate.png)
-
 | Page | Route | Who |
 |---|---|---|
 | Home / feed | `/` | Logged-in users |
@@ -31,18 +28,19 @@ Built by Lucy Keeling (n8102571) for IFQ636 at QUTOnline, extending the starter 
 | Dashboard | `/dashboard` | Logged-in users |
 | Search | `/search` | Logged-in users |
 | Moderate posts | `/moderate` | Admins |
+| Edit Categories | `/settings` | Admins |
 
-Admin account log in details for demo:
-Email: admin@qut.edu.au
-Password: admin
+**Admin account log in details for demo:**
+* **Email:** admin@qut.edu.au
+* **Password:** admin
 
 ## 📦 Installation
 
 **Requirements:** Node.js, npm, and a MongoDB database (local or Atlas).
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/lucykeeling/hobby-sharing-community.git
+cd hobby-sharing-community
 npm run install-all
 ```
 
@@ -63,10 +61,6 @@ npm run dev
 The frontend runs at http://localhost:3000 and the API at http://localhost:5001.
 
 ## 🛠️ Development
-
-```bash
-npm test --prefix backend   # run backend tests (mocha)
-```
 
 Project layout:
 
