@@ -1,12 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { useAuth } from '../context/AuthContext';
+
+
 
 const ErrorPage = () => {
+    const { user } = useAuth();
     return (
         <section className="error-page">
             <div className ="center">
-                <Link to="/" className="btn primary">Back Home</Link>
                 <h2>Oops! Page Not Found</h2>
-            </div>
+                <Link to="/" className="btn primary"> {user ? "Back to Feed" : "Go to Login"} </Link>
+                </div>
         </section>
     )
 }
