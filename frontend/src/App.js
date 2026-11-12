@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard';
 import CategoryPosts from './pages/CategoryPosts';
 import EditPost from './pages/EditPost';
 import Moderate from './pages/Moderate';
-
+import ErrorPage from './pages/ErrorPage';
 
 
 function App() {
@@ -29,6 +29,7 @@ function App() {
         <Route path="/post/:id/edit" element={<EditPost />} />
         <Route path="/search" element={<CategoryPosts />} />
         <Route path="/moderate" element={<Moderate />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer />
     </Router>
