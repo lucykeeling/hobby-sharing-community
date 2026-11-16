@@ -3,12 +3,14 @@ import PostItem from '../components/PostItem';
 import axiosInstance from '../axiosConfig';
 import { useSearchParams } from 'react-router-dom';
 import { API_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
 
 const Search = () => {
     const [posts, setPosts] = React.useState([]);
     const [searchParams] = useSearchParams();
     const [query, setQuery] = React.useState(searchParams.get('q') || '');
     const [searchText, setSearchText] = React.useState(query);
+    const {user} = useAuth();
 
 
     React.useEffect(() => {
@@ -26,14 +28,14 @@ const Search = () => {
 
         const fetchPosts = async () => {
             try {
-                const response = await axiosInstance.get('/api/posts/search', { params: { q: query } });
+                const response = await axiosInstance.get('/api/posts/search', { params: { q: query }, headers: { Authorization: `Bearer ${user.token}` } });
                 setPosts(response.data);
             } catch (error) {
                 console.error('Error searching posts:', error);
             }
         };
         fetchPosts();
-    }, [query]);
+    }, [query, user]);
 
     const handleSearch = (e) => {
         e.preventDefault();
