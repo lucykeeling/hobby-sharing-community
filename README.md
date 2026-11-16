@@ -80,7 +80,9 @@ API overview:
 ## 🔗 Links:
 
 - Jira link: https://lucykeeling.atlassian.net/jira/software/projects/HSC/summary
-- Live Deployment: 
+- Figma link: https://www.figma.com/design/4i9mmh1IOEcUuJKcrzNXFh/hobby-sharing-community?node-id=3-28&t=BOgmtlU4UBVNoCUz-1
+- Draw.io link:https://viewer.diagrams.net/?tags=%7B%7D&lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=hobby-sharing-community.drawio&dark=auto#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D1a_O1lU_TL0g5iq4GxqGnPg7nGCWqJsMu%26export%3Ddownload
+- Live Deployment: http://3.27.70.71/
 
 ## 📚 Acknowledgements & References:
 
