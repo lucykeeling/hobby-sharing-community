@@ -50,9 +50,10 @@ const EditPost = () => {
 
     // Load the existing post into the form
     useEffect(() => {
-        const fetchPost = async () => {
+        if (!user?.token) return;         
+            const fetchPost = async () => {
             try {
-                const response = await axiosInstance.get(`/api/posts/${id}`);
+                const response = await axiosInstance.get(`/api/posts/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 setTitle(response.data.title);
                 setCategory(response.data.category?._id || response.data.category);
                 setDescription(response.data.description);
