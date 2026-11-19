@@ -6,10 +6,11 @@ const PostAuthor = ({ creator, createdAt }) => {
     return (
         <div className="post_author">
             <div className="post_author-avatar">
-            <img src={
-                creator?.profileImage ? `${API_URL}/uploads/${creator.profileImage}` : Avatar    
-                
-            } alt="" />
+            <img
+                src={creator?._id ? `${API_URL}/api/auth/user-image/${creator._id}` : Avatar}
+                onError={(e) => { e.target.onerror = null; e.target.src = Avatar; }}
+                alt=""
+            />
             </div>
             <div className="post_author-details">
                 <h5>By: {creator?.name || 'Unknown'}</h5>

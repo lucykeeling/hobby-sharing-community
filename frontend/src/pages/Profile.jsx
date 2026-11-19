@@ -12,9 +12,10 @@ const Profile = () => {
     email: '',
     role: '',
     postCount: '',
-    profileImage: '',
+    hasProfileImage: false,
   });
-  const [image, setImage] = useState(null);   
+  const [image, setImage] = useState(null);
+  const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -30,7 +31,7 @@ const Profile = () => {
           name: response.data.name,
           email: response.data.email,
           role: response.data.role,
-          profileImage: response.data.profileImage,
+          hasProfileImage: response.data.hasProfileImage,
         });
         setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
@@ -58,6 +59,11 @@ const Profile = () => {
       await axiosInstance.put('/api/auth/profile', data, {
         headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' },
       });
+      if (image) {
+        setFormData((prev) => ({ ...prev, hasProfileImage: true }));
+        setImage(null);
+        setAvatarVersion(Date.now());
+      }
       alert('Profile updated successfully!');
     } catch (error) {
       alert('Failed to update profile. Please try again.');
@@ -79,8 +85,8 @@ const Profile = () => {
     src={
       image
         ? URL.createObjectURL(image)
-        : formData.profileImage
-        ? `${API_URL}/uploads/${formData.profileImage}`
+        : formData.hasProfileImage
+        ? `${API_URL}/api/auth/user-image/${user.id}?t=${avatarVersion}`
         : Avatar  
     }
     alt="Profile"

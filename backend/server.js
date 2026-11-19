@@ -14,7 +14,6 @@ app.use(express.json());
 app.use(require('express-fileupload')());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/posts', require('./routes/postRoutes'));
-app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
 
 

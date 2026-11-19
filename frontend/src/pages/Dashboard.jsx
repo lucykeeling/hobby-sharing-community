@@ -49,7 +49,7 @@ const Dashboard = () => {
                             return <article key={post._id} className="dashboard_post">
                                 <div className="dashboard_post-info">
                                 <div className="dashboard_post-image">
-                                    <img src={`${API_URL}/uploads/${post.image}`} alt={post.title} />
+                                    <img src={`${API_URL}/api/posts/image/${post._id}`} alt={post.title} />
                                     </div>
                                 <h5>{post.title}</h5>
                                 </div>

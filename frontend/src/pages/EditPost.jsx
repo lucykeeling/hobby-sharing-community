@@ -15,7 +15,6 @@ const EditPost = () => {
     const [categories, setCategories] = useState([]);
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null);
-    const [currentImage, setCurrentImage] = useState('');
     const [error, setError] = useState('');
 
     const modules = {
@@ -57,7 +56,6 @@ const EditPost = () => {
                 setTitle(response.data.title);
                 setCategory(response.data.category?._id || response.data.category);
                 setDescription(response.data.description);
-                setCurrentImage(response.data.image);
             } catch (err) {
                 console.error('Failed to fetch post', err);
                 setError('Could not load post');
@@ -110,9 +108,7 @@ const EditPost = () => {
                         ))}
                     </select>
                     <ReactQuill modules={modules} formats={formats} value={description} onChange={setDescription} placeholder="Description" className="q1-editor" />
-                    {currentImage && (
-                        <img src={`${API_URL}/uploads/${currentImage}`} alt={title} style={{ maxWidth: '200px' }} />
-                    )}
+                    <img src={image ? URL.createObjectURL(image) : `${API_URL}/api/posts/image/${id}`} alt={title} style={{ maxWidth: '200px' }} />
                     <input type="file" onChange={(e) => setImage(e.target.files[0])} accept="image/png, image/jpeg" />
                     <button type="submit" className="btn primary">Update</button>
                 </form>

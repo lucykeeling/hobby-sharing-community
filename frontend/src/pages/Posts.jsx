@@ -28,13 +28,13 @@ if (!user) return <Navigate to="/login" />;
         <section className="category_posts">
             {posts.length > 0 ? <div className="container post_container">
                     {
-                        posts.map(({_id, title, description, image, creator, createdAt, category}) => 
-                        <PostItem 
-                        key={_id} 
-                        postID={_id} 
-                        title={title} 
-                        description={description} 
-                        image={`${API_URL}/uploads/${image}`}
+                        posts.map(({_id, title, description, creator, createdAt, category}) =>
+                        <PostItem
+                        key={_id}
+                        postID={_id}
+                        title={title}
+                        description={description}
+                        image={`${API_URL}/api/posts/image/${_id}`}
                         creator={creator} 
                         createdAt={createdAt} 
                         category={category} />              )

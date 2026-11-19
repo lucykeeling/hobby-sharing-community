@@ -66,7 +66,7 @@ const PostDetail = () => {
                 </div>
                 <h1>{post.title}</h1>
                 <div className="post-detail_image">
-                    <img src={`${API_URL}/uploads/${post.image}`} alt={post.title} />
+                    <img src={`${API_URL}/api/posts/image/${post._id}`} alt={post.title} />
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: post.description }} />
             </div>
