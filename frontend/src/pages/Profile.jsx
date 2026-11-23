@@ -5,6 +5,7 @@ import Avatar from '../images/avatar.png';
 import { API_URL } from '../config';
 
 
+
 const Profile = () => {
   const { user } = useAuth(); // Access user token from context
   const [formData, setFormData] = useState({
@@ -76,6 +77,7 @@ const Profile = () => {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
+
   return (
     <div className="max-w-md mx-auto mt-20">
       <form onSubmit={handleSubmit} className="form bg-white p-6 rounded shadow-md">
@@ -143,4 +145,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Profile; 
