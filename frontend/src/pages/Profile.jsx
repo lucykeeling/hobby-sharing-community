@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 import Avatar from '../images/avatar.png';
 import { API_URL } from '../config';
+import PostItem from '../components/PostItem';
 
 
 
@@ -25,7 +26,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get('/api/auth/profile', {
+        const response = await axiosInstance.get('/api/user/profile', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setFormData({
@@ -36,7 +37,7 @@ const Profile = () => {
         });
         setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
-        alert('Failed to fetch profile. Please try again.');
+        alert('Failed to load profile. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -44,6 +45,22 @@ const Profile = () => {
 
     if (user) fetchProfile();
   }, [user]);
+
+    const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchUserPosts = async () => {
+            try {
+                const response = await axiosInstance.get(`/api/posts/user`, {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                });
+                setPosts(response.data);
+            } catch (error) {
+                console.error('Error fetching user posts:', error);
+            }
+        };
+        if (user)  fetchUserPosts();
+    }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,7 +74,7 @@ const Profile = () => {
         data.append('profileImage', image);
       }
 
-      await axiosInstance.put('/api/auth/profile', data, {
+      await axiosInstance.put('/api/user/profile', data, {
         headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' },
       });
       if (image) {
@@ -73,14 +90,14 @@ const Profile = () => {
     }
   };
 
+
   if (loading) {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
-
   return (
-    <div className="max-w-md mx-auto mt-20">
-      <form onSubmit={handleSubmit} className="form bg-white p-6 rounded shadow-md">
+    <div className="max-w-6xl mx-auto mt-20 flex gap-8">
+      <form onSubmit={handleSubmit} className="form bg-white p-6 w-1/3 rounded shadow-md">
         <h1 className="text-2xl font-bold text-center">Your Profile</h1>
 
           <img
@@ -88,7 +105,7 @@ const Profile = () => {
       image
         ? URL.createObjectURL(image)
         : formData.hasProfileImage
-        ? `${API_URL}/api/auth/user-image/${user.id}?t=${avatarVersion}`
+        ? `${API_URL}/api/user/user-image/${user.id}?t=${avatarVersion}`
         : Avatar  
     }
     alt="Profile"
@@ -141,8 +158,27 @@ const Profile = () => {
           {loading ? 'Updating...' : 'Update Profile'}
         </button>
       </form>
+
+    <section className="category_posts flex-1">
+            {posts.length > 0 ? <div className="container profile_post_container">
+                    {
+                        posts.map(({_id, title, description, creator, createdAt, category}) =>
+                        <PostItem
+                        key={_id}
+                        postID={_id}
+                        title={title}
+                        description={description}
+                        image={`${API_URL}/api/posts/image/${_id}`}
+                        creator={creator} 
+                        createdAt={createdAt} 
+                        category={category} />              
+                      )
+                }
+            </div> : <h2 className='center'>No posts available.</h2>}
+        </section>
+
     </div>
   );
 };
 
-export default Profile; 
+export default Profile;

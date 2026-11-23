@@ -15,6 +15,7 @@ app.use(require('express-fileupload')());
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/posts', require('./routes/postRoutes'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/user', require('./routes/userRoutes'));
 
 
 

@@ -492,7 +492,7 @@ footer {
     color: var(--primary-color);
 }
 
-/*============Profile Form ============*/
+/*============Profile Page ============*/
 .profile-input {
     width: 100%;
     padding: 0.8rem 1rem;
@@ -505,6 +505,12 @@ footer {
 
 .profile-input:focus {
     border-color: var(--primary-color);
+}
+
+.profile_post_container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
 }
 
 /*============Error Page ============*/
