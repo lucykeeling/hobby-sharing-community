@@ -23,9 +23,11 @@ const Header = () => {
                     {user ? (
                         <>
 
+                        <li><Link to ="/profile" className="nav-links">Profile</Link> </li>
                         <li><Link to="/createpost" className="nav-links">Create Post</Link> </li>
                         <li><Link to="/search" className="nav-links">Search Posts</Link> </li>
                         <li><Link to ="/dashboard" className="nav-links">Dashboard</Link> </li>
+
 
                         {user.role === 'Admin' && (
                             <>
@@ -35,7 +37,6 @@ const Header = () => {
                     </>)
                         }
 
-                        <li><Link to="/profile" className="nav-links">Profile</Link> </li>
                         <li><button onClick={handleLogout} className="nav-links">Logout</button></li>
                     
                         </>
