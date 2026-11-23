@@ -4,6 +4,7 @@ import axiosInstance from '../axiosConfig';
 import Avatar from '../images/avatar.png';
 import { API_URL } from '../config';
 import PostItem from '../components/PostItem';
+import { Navigate } from 'react-router-dom';
 
 
 
@@ -89,7 +90,9 @@ const Profile = () => {
       setLoading(false);
     }
   };
-
+  if (!user) {
+    return <Navigate to="/login" replace/>;
+  }
 
   if (loading) {
     return <div className="text-center mt-20">Loading...</div>;
