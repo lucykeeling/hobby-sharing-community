@@ -23,6 +23,7 @@ const Profile = () => {
     postCount: '',
     hasProfileImage: false,
   });
+  const [visibility, setVisibility] = useState({ bio: true, badges: true, posts: true });
   const [image, setImage] = useState(null);
   const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const [loading, setLoading] = useState(false);
@@ -114,6 +115,9 @@ const Profile = () => {
       ;
     }
   };
+
+  const isVisible = (section) => isOwnProfile || visibility[section];
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -186,6 +190,20 @@ const Profile = () => {
             onChange={(e) => setImage(e.target.files[0])}
             accept="image/png, image/jpeg" />
 
+          <fieldset className="mb-4">
+            <legend className="mb-2 font-semibold">Show on public profile</legend>
+            {['bio', 'badges', 'postStats'].map((key) => (
+              <label key={key} className="mr-4 inline-flex items-center">
+                <input
+                  type="checkbox"
+                  checked={visibility[key]}
+                  onChange={() => setVisibility((v) => ({ ...v, [key]: !v[key] }))}
+                  className="mr-2"
+                />
+                {key}
+              </label>
+            ))}
+          </fieldset>
 
           {isAdmin && (
             <fieldset>
@@ -236,9 +254,9 @@ const Profile = () => {
 
       <section className="category_posts flex-1 mt-0">
         <div className="space-y-4">
-          <ProfileBio bio="Hello, this is a test bio" />
-          <ProfileBadges badges={['Early Adopter', 'Top Poster']} />
-          <ProfilePostStats postsCount={posts.length} />
+          {isVisible('bio') && <ProfileBio bio="Hello, this is a test bio" />}
+          {isVisible('badges') && <ProfileBadges badges={['Early Adopter', 'Top Poster']} />}
+          {isVisible('posts') && <ProfilePostStats postsCount={posts.length} />}
         </div>
 
         {posts.length > 0 ? <div className="container profile_post_container">
