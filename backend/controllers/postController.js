@@ -1,6 +1,7 @@
 const Post = require('../models/post');
 const User = require('../models/User');
 const Category = require('../models/Category');
+const mongoose = require('mongoose');
 
 // Create a post
 const createPost = async (req, res) => {
@@ -17,7 +18,7 @@ const createPost = async (req, res) => {
             return res.status(422).json({ message: 'File size should be less than 2MB' });
         }
 
-        
+
 
         const newPost = await Post.create({
             title,
@@ -42,21 +43,21 @@ const createPost = async (req, res) => {
 // Get all posts
 const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find( { postStatus: 'approved' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name').populate('category', 'Category_name');
+        const posts = await Post.find({ postStatus: 'approved' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name').populate('category', 'Category_name');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};  
+};
 // Get all pending posts
 const getAllPendingPosts = async (req, res) => {
     try {
-        const posts = await Post.find( { postStatus: 'pending' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name');
+        const posts = await Post.find({ postStatus: 'pending' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name');
         res.status(200).json(posts);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};  
+};
 
 // Get user's posts
 const getUserPosts = async (req, res) => {
@@ -66,16 +67,19 @@ const getUserPosts = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};  
+};
 // Get all approved posts for a specific user
 const getPostsByAuthor = async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.userId)) {
+        return res.status(404).json({ message: 'User not found' });
+    }
     try {
-        const posts = await Post.find( { creator: req.params.userId, postStatus: 'approved' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name').populate('category', 'Category_name');
+        const posts = await Post.find({ creator: req.params.userId, postStatus: 'approved' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name').populate('category', 'Category_name');
         res.status(200).json(posts);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'An unexpected error occurred while fetching posts' });
     }
-};  
+};
 
 //Get a single post by ID
 const getPost = async (req, res) => {
@@ -88,7 +92,7 @@ const getPost = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};  
+};
 
 // Get post image by ID
 const getPostImage = async (req, res) => {
@@ -117,12 +121,12 @@ const getCatPosts = async (req, res) => {
 // Search posts by title, description, or category
 const searchPosts = async (req, res) => {
     try {
-        const { q } = req.query;        
+        const { q } = req.query;
         const filter = { postStatus: 'approved' };
 
         if (q && q.trim()) {
             const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(escaped, 'i');    
+            const regex = new RegExp(escaped, 'i');
             const matchingCats = await Category.find({ Category_name: regex }).select('_id');
             const catIds = matchingCats.map((c) => c._id);
 
@@ -195,20 +199,20 @@ const deletePost = async (req, res) => {
         const postId = req.params.id;
         const post = await Post.findById(postId);
 
-    if (!post) {
-        return res.status(404).json({ message: 'Post not found' });
-    }
-    if (post.creator.toString() !== req.user.id) {
-        return res.status(403).json({ message: 'You are not the owner of this post' });
-    }
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        if (post.creator.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'You are not the owner of this post' });
+        }
 
 
-                await Post.findByIdAndDelete(postId);
-               
-                const currentUser = await User.findById(req.user.id);
-                const userPostCount = currentUser.postCount > 0 ? currentUser.postCount - 1 : 0;
-                await User.findByIdAndUpdate(req.user.id, { postCount: userPostCount });
-                res.status(200).json({ message: 'Post deleted successfully' });
+        await Post.findByIdAndDelete(postId);
+
+        const currentUser = await User.findById(req.user.id);
+        const userPostCount = currentUser.postCount > 0 ? currentUser.postCount - 1 : 0;
+        await User.findByIdAndUpdate(req.user.id, { postCount: userPostCount });
+        res.status(200).json({ message: 'Post deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -218,37 +222,37 @@ const deletePost = async (req, res) => {
 
 // Moderate Posts
 const moderatePost = async (req, res) => {
- 
+
     try {
-     const postId = req.params.id;
-     const { postStatus, rejectionReason } = req.body;
+        const postId = req.params.id;
+        const { postStatus, rejectionReason } = req.body;
 
         if (req.user.role !== 'Admin') {
             return res.status(403).json({ message: 'You do not have permission to moderate posts' });
         }
 
         if (!['approved', 'rejected'].includes(postStatus)) {
-                return res.status(400).json({ message: 'Invalid post status' });
+            return res.status(400).json({ message: 'Invalid post status' });
         }
 
         if (postStatus === 'rejected' && !rejectionReason) {
-        return res.status(400).json({ message: 'Rejection reason is required when rejecting a post' });
-    }
+            return res.status(400).json({ message: 'Rejection reason is required when rejecting a post' });
+        }
 
         const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }
-                post.postStatus = postStatus
-                post.rejectionReason = postStatus === 'rejected' ? rejectionReason : '';
-     
-                const updatedPost = await post.save();
+        post.postStatus = postStatus
+        post.rejectionReason = postStatus === 'rejected' ? rejectionReason : '';
+
+        const updatedPost = await post.save();
         const { image: _img, ...postWithoutImage } = updatedPost.toObject();
         res.status(200).json(postWithoutImage);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};            
+};
 
 
 

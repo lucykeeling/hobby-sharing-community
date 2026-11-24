@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 
 const getProfile = async (req, res) => {
@@ -21,6 +22,9 @@ const getProfile = async (req, res) => {
     };
 
 const getPublicProfile = async (req, res) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(404).json({ message: 'User not found' });
+    }
     try {
         const user = await User.findById(req.params.id).select('name profileImage');
         if (!user) {
@@ -32,7 +36,7 @@ const getPublicProfile = async (req, res) => {
             hasProfileImage: !!user.profileImage?.data,
         });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: 'An unexpected error occurred while fetching the user profile' });
     }
 };   
 

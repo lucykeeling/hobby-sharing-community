@@ -30,6 +30,7 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     // Fetch profile data from the backend
@@ -38,6 +39,7 @@ const Profile = () => {
       setSaving(false);
       setError('');
       setMessage('');
+      setNotFound(false);
       try {
         const url = isOwnProfile ? '/api/user/profile' : `/api/user/profile/${userId}`;  
         const response = await axiosInstance.get(url, {
@@ -51,7 +53,11 @@ const Profile = () => {
           });
           setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
+        if (error.response?.status === 404) {
+          setNotFound(true);
+        } else {
           setError(error.response?.data?.message || 'Failed to load profile. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
@@ -119,6 +125,15 @@ const Profile = () => {
     </div>
     );
   }
+
+  if (notFound) {
+    return (
+      <div className="max-w-md mx-auto mt-20 p-4 bg-yellow-100 text-yellow-700 rounded shadow-md" role="alert">
+        <p className ="mb-3"> User not found. </p>  
+        </div>
+    )
+  }
+      
 
   if (error) {
     return (
