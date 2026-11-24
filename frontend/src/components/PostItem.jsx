@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import PostAuthor  from './PostAuthor'
 
-const PostItem = ({ postID, category, title, description, creator, createdAt, image }) => {
+const PostItem = ({ postID, category, title, description, creator, createdAt, image, avatarVersion }) => {
     const shortDescription = description.length > 145 ? description.substring(0, 145) + '...' : description;
     const postTitle = title.length > 30 ? title.substring(0, 30) + '...' : title;
     return (
@@ -16,7 +16,7 @@ const PostItem = ({ postID, category, title, description, creator, createdAt, im
             </Link>
             <div dangerouslySetInnerHTML={{ __html: shortDescription }} />
             <div className="post_footer">
-                <PostAuthor creator={creator} createdAt={createdAt} />
+                <PostAuthor creator={creator} createdAt={createdAt} avatarVersion={avatarVersion} />
               <Link to={`/category/${category?._id}`} className="btn category">
                     {category?.Category_name}
                 </Link>

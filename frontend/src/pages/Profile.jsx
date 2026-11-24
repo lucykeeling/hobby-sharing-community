@@ -20,25 +20,31 @@ const Profile = () => {
   const [image, setImage] = useState(null);
   const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Fetch profile data from the backend
     const fetchProfile = async () => {
       setLoading(true);
+      setSaving(false);
+      setError('');
+      setMessage('');
       try {
-        const response = await axiosInstance.get('/api/user/profile', {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        setFormData({
-          name: response.data.name,
-          email: response.data.email,
-          role: response.data.role,
-          hasProfileImage: response.data.hasProfileImage,
-        });
-        setIsAdmin(response.data.role === 'Admin');
+          const response = await axiosInstance.get('/api/user/profile', {
+            headers: { Authorization: `Bearer ${user.token}` },
+          });
+          setFormData({
+            name: response.data.name,
+            email: response.data.email,
+            role: response.data.role,
+            hasProfileImage: response.data.hasProfileImage,
+          });
+          setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
-        alert('Failed to load profile. Please try again.');
+          setError(error.response?.data?.message || 'Failed to load profile. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -49,23 +55,25 @@ const Profile = () => {
 
     const [posts, setPosts] = useState([]);
 
-  useEffect(() => {
     const fetchUserPosts = async () => {
-            try {
-                const response = await axiosInstance.get(`/api/posts/user`, {
-                    headers: { Authorization: `Bearer ${user.token}` },
-                });
-                setPosts(response.data);
+        try {
+            const response = await axiosInstance.get(`/api/posts/user`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+            });
+            setPosts(response.data);
             } catch (error) {
-                console.error('Error fetching user posts:', error);
+             console.error('Error fetching user posts:', error);
             }
         };
+
+  useEffect(() => {
         if (user)  fetchUserPosts();
     }, [user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
+    setMessage(null);
     try {
       const data = new FormData();
       data.append('name', formData.name);
@@ -83,11 +91,13 @@ const Profile = () => {
         setImage(null);
         setAvatarVersion(Date.now());
       }
-      alert('Profile updated successfully!');
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      await fetchUserPosts();
     } catch (error) {
-      alert('Failed to update profile. Please try again.');
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to update profile. Please try again.' });
     } finally {
-      setLoading(false);
+      setSaving(false);
+      ;
     }
   };
   if (!user) {
@@ -95,8 +105,23 @@ const Profile = () => {
   }
 
   if (loading) {
-    return <div className="text-center mt-20">Loading...</div>;
+    return (
+    <div className="flex justify-center items-center mt-20">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+    </div>
+    );
   }
+
+  if (error) {
+    return (
+      <div className="max-w-md mx-auto mt-20 p-4 bg-red-100 text-red-700 rounded shadow-md" role="alert">
+      <p className ="mb-3"> {error} </p>
+      <button onClick={() => window.location.reload()} className="bg-red-700 text-white px-4 py-2 rounded"> Try again
+      </button>
+      </div>
+    )
+    };
+  
 
   return (
     <div className="max-w-6xl mx-auto mt-20 flex gap-8">
@@ -156,9 +181,15 @@ const Profile = () => {
           ))}
           </fieldset>
 )}
+    {message && (
+      <p className={message.type ==='error' ? 'text-red-600 mb-3' : 'text-green-600 mb-3'}
+      role="alert">
+        {message.text}
+      </p>
+    )}  
 
-        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
-          {loading ? 'Updating...' : 'Update Profile'}
+        <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white p-2 rounded">
+          {saving ? 'Updating...' : 'Update Profile'}
         </button>
       </form>
 
@@ -174,7 +205,8 @@ const Profile = () => {
                         image={`${API_URL}/api/posts/image/${_id}`}
                         creator={creator} 
                         createdAt={createdAt} 
-                        category={category} />              
+                        category={category}
+                        avatarVersion={avatarVersion} />              
                       )
                 }
             </div> : <h2 className='center'>No posts available.</h2>}
@@ -182,6 +214,6 @@ const Profile = () => {
 
     </div>
   );
-};
+};  
 
 export default Profile;
