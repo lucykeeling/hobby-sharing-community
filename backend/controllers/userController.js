@@ -27,7 +27,7 @@ const getUserImage = async (req, res) => {
             return res.status(404).end();
         }
         res.set('Content-Type', user.profileImage.contentType);
-        res.set('Cache-Control', 'public, max-age=86400');
+        res.set('Cache-Control', 'no-cache');
         res.send(user.profileImage.data);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -80,7 +80,7 @@ const updateUserProfile = async (req, res) => {
         user.postCount = req.body.postCount || user.postCount; // Only allow post count change if provided
 
         const updatedUser = await user.save();
-        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role, hasProfileImage: !!updatedUser.profileImage?.data, token: generateToken(updatedUser.id) });
+        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role, hasProfileImage: !!updatedUser.profileImage?.data });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
