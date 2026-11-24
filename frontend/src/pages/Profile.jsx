@@ -5,6 +5,9 @@ import Avatar from '../images/avatar.png';
 import { API_URL } from '../config';
 import PostItem from '../components/PostItem';
 import { Navigate } from 'react-router-dom';
+import ProfileBio from '../components/Profile/ProfileBio';
+import ProfileBadges from '../components/Profile/ProfileBadges';
+import ProfilePostStats from '../components/Profile/ProfilePostStats';
 
 
 
@@ -193,7 +196,13 @@ const Profile = () => {
         </button>
       </form>
 
-    <section className="category_posts flex-1">
+    <section className="category_posts flex-1 mt-0">
+      <div className="space-y-4">
+      <ProfileBio bio="Hello, this is a test bio" />
+      <ProfileBadges badges={['Early Adopter', 'Top Poster']} />
+      <ProfilePostStats postsCount={posts.length} />
+      </div>
+
             {posts.length > 0 ? <div className="container profile_post_container">
                     {
                         posts.map(({_id, title, description, creator, createdAt, category}) =>
