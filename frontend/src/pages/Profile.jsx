@@ -41,17 +41,17 @@ const Profile = () => {
       setMessage('');
       setNotFound(false);
       try {
-        const url = isOwnProfile ? '/api/user/profile' : `/api/user/profile/${userId}`;  
+        const url = isOwnProfile ? '/api/user/profile' : `/api/user/profile/${userId}`;
         const response = await axiosInstance.get(url, {
-            headers: { Authorization: `Bearer ${user.token}` },
-          });
-          setFormData({
-            name: response.data.name,
-            email: response.data.email,
-            role: response.data.role,
-            hasProfileImage: response.data.hasProfileImage,
-          });
-          setIsAdmin(response.data.role === 'Admin');
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        setFormData({
+          name: response.data.name,
+          email: response.data.email,
+          role: response.data.role,
+          hasProfileImage: response.data.hasProfileImage,
+        });
+        setIsAdmin(response.data.role === 'Admin');
       } catch (error) {
         if (error.response?.status === 404) {
           setNotFound(true);
@@ -66,23 +66,23 @@ const Profile = () => {
     if (user) fetchProfile();
   }, [user, userId]);
 
-    const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([]);
 
-    const fetchUserPosts = async () => {
-        try {
-          const url = isOwnProfile ? '/api/posts/user' : `/api/posts/author/${userId}`;  
-          const response = await axiosInstance.get(url, {
-            headers: { Authorization: `Bearer ${user.token}` },
-            });
-            setPosts(response.data);
-            } catch (error) {
-             console.error('Error fetching user posts:', error);
-            }
-        };
+  const fetchUserPosts = async () => {
+    try {
+      const url = isOwnProfile ? '/api/posts/user' : `/api/posts/author/${userId}`;
+      const response = await axiosInstance.get(url, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setPosts(response.data);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    }
+  };
 
   useEffect(() => {
-        if (user)  fetchUserPosts();
-    }, [user, userId]);
+    if (user) fetchUserPosts();
+  }, [user, userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,36 +115,39 @@ const Profile = () => {
     }
   };
   if (!user) {
-    return <Navigate to="/login" replace/>;
+    return <Navigate to="/login" replace />;
+  }
+  if (user && userId === user.id) {
+    return <Navigate to="/profile" replace />;
   }
 
   if (loading) {
     return (
-    <div className="flex justify-center items-center mt-20">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
-    </div>
+      <div className="flex justify-center items-center mt-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
+      </div>
     );
   }
 
   if (notFound) {
     return (
       <div className="max-w-md mx-auto mt-20 p-4 bg-yellow-100 text-yellow-700 rounded shadow-md" role="alert">
-        <p className ="mb-3"> User not found. </p>  
-        </div>
+        <p className="mb-3"> User not found. </p>
+      </div>
     )
   }
-      
+
 
   if (error) {
     return (
       <div className="max-w-md mx-auto mt-20 p-4 bg-red-100 text-red-700 rounded shadow-md" role="alert">
-      <p className ="mb-3"> {error} </p>
-      <button onClick={() => window.location.reload()} className="bg-red-700 text-white px-4 py-2 rounded"> Try again
-      </button>
+        <p className="mb-3"> {error} </p>
+        <button onClick={() => window.location.reload()} className="bg-red-700 text-white px-4 py-2 rounded"> Try again
+        </button>
       </div>
     )
-    };
-  
+  };
+
 
   return (
     <div className="max-w-6xl mx-auto mt-20 flex gap-8">
@@ -153,111 +156,111 @@ const Profile = () => {
           <h1 className="text-2xl font-bold text-center">Your Profile</h1>
 
           <img
-    src={
-      image
-        ? URL.createObjectURL(image)
-        : formData.hasProfileImage
-        ? `${API_URL}/api/user/user-image/${profileId}?t=${avatarVersion}`
-        : Avatar  
-    }
-    alt="Profile"
-    className="profile-image mb-4"
-  />
-  
-        <input 
-          type="text"
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className = "profile-input mb-4"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className = "profile-input mb-4"
-        />
-        <input 
-        type="file" 
-        onChange={(e) => setImage(e.target.files[0])} 
-        accept="image/png, image/jpeg" />
-
-
-        {isAdmin && (
-          <fieldset>
-            <legend className="mb-2 font-semibold">Role</legend>
-            {[
-            { value: 'Member', label: 'Member' },
-            { value: 'Admin', label: 'Admin' },
-             ].map(({ value, label }) => (
-            <label key={value} className="mr-6 inline-flex items-center">
-            <input
-            type="radio"
-            name="role"
-            value={value}
-            checked={formData.role === value}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-            className="mr-2"
+            src={
+              image
+                ? URL.createObjectURL(image)
+                : formData.hasProfileImage
+                  ? `${API_URL}/api/user/user-image/${profileId}?t=${avatarVersion}`
+                  : Avatar
+            }
+            alt="Profile"
+            className="profile-image mb-4"
           />
-          {label}
-          </label>
-          ))}
-          </fieldset>
-)}
-    {message && (
-      <p className={message.type ==='error' ? 'text-red-600 mb-3' : 'text-green-600 mb-3'}
-      role="alert">
-        {message.text}
-      </p>
-    )}  
 
-        <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white p-2 rounded">
-          {saving ? 'Updating...' : 'Update Profile'}
-        </button>
-      </form>
+          <input
+            type="text"
+            placeholder="Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="profile-input mb-4"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="profile-input mb-4"
+          />
+          <input
+            type="file"
+            onChange={(e) => setImage(e.target.files[0])}
+            accept="image/png, image/jpeg" />
+
+
+          {isAdmin && (
+            <fieldset>
+              <legend className="mb-2 font-semibold">Role</legend>
+              {[
+                { value: 'Member', label: 'Member' },
+                { value: 'Admin', label: 'Admin' },
+              ].map(({ value, label }) => (
+                <label key={value} className="mr-6 inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={value}
+                    checked={formData.role === value}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="mr-2"
+                  />
+                  {label}
+                </label>
+              ))}
+            </fieldset>
+          )}
+          {message && (
+            <p className={message.type === 'error' ? 'text-red-600 mb-3' : 'text-green-600 mb-3'}
+              role="alert">
+              {message.text}
+            </p>
+          )}
+
+          <button type="submit" disabled={saving} className="w-full bg-blue-600 text-white p-2 rounded">
+            {saving ? 'Updating...' : 'Update Profile'}
+          </button>
+        </form>
       ) : (
         <div className="bg-white p-6 w-1/3 rounded shadow-md text-center">
-    <img
-      src={
-        formData.hasProfileImage
-          ? `${API_URL}/api/user/user-image/${profileId}?t=${avatarVersion}`
-          : Avatar
-      }
-      alt="Profile"
-      className="profile-image mb-4"
-    />
-    <h1 className="text-2xl font-bold">{formData.name}</h1>
-  </div>
-)}
+          <img
+            src={
+              formData.hasProfileImage
+                ? `${API_URL}/api/user/user-image/${profileId}?t=${avatarVersion}`
+                : Avatar
+            }
+            alt="Profile"
+            className="profile-image mb-4"
+          />
+          <h1 className="text-2xl font-bold">{formData.name}</h1>
+        </div>
+      )}
 
-    <section className="category_posts flex-1 mt-0">
-      <div className="space-y-4">
-      <ProfileBio bio="Hello, this is a test bio" />
-      <ProfileBadges badges={['Early Adopter', 'Top Poster']} />
-      <ProfilePostStats postsCount={posts.length} />
-      </div>
+      <section className="category_posts flex-1 mt-0">
+        <div className="space-y-4">
+          <ProfileBio bio="Hello, this is a test bio" />
+          <ProfileBadges badges={['Early Adopter', 'Top Poster']} />
+          <ProfilePostStats postsCount={posts.length} />
+        </div>
 
-            {posts.length > 0 ? <div className="container profile_post_container">
-                    {
-                        posts.map(({_id, title, description, creator, createdAt, category}) =>
-                        <PostItem
-                        key={_id}
-                        postID={_id}
-                        title={title}
-                        description={description}
-                        image={`${API_URL}/api/posts/image/${_id}`}
-                        creator={creator} 
-                        createdAt={createdAt} 
-                        category={category}
-                        avatarVersion={avatarVersion} />              
-                      )
-                }
-            </div> : <h2 className='center'>No posts available.</h2>}
-        </section>
+        {posts.length > 0 ? <div className="container profile_post_container">
+          {
+            posts.map(({ _id, title, description, creator, createdAt, category }) =>
+              <PostItem
+                key={_id}
+                postID={_id}
+                title={title}
+                description={description}
+                image={`${API_URL}/api/posts/image/${_id}`}
+                creator={creator}
+                createdAt={createdAt}
+                category={category}
+                avatarVersion={avatarVersion} />
+            )
+          }
+        </div> : <h2 className='center'>No posts available.</h2>}
+      </section>
 
     </div>
   );
-};  
+};
 
 export default Profile;
