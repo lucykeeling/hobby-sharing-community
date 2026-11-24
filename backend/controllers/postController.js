@@ -67,6 +67,15 @@ const getUserPosts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };  
+// Get all approved posts for a specific user
+const getPostsByAuthor = async (req, res) => {
+    try {
+        const posts = await Post.find( { creator: req.params.userId, postStatus: 'approved' }).select('-image').sort({ createdAt: -1 }).populate('creator', 'name').populate('category', 'Category_name');
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};  
 
 //Get a single post by ID
 const getPost = async (req, res) => {
@@ -243,4 +252,6 @@ const moderatePost = async (req, res) => {
 
 
 
-module.exports = { createPost, getAllPosts, getAllPendingPosts, getUserPosts, getPost, getCatPosts, searchPosts, editPost, deletePost, moderatePost, getPostImage };
+
+
+module.exports = { createPost, getAllPosts, getAllPendingPosts, getUserPosts, getPostsByAuthor, getPost, getCatPosts, searchPosts, editPost, deletePost, moderatePost, getPostImage };

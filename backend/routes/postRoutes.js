@@ -1,5 +1,5 @@
 const express = require('express');
-const { createPost, getAllPosts, getUserPosts, getPost, getPostImage, getCatPosts, searchPosts, editPost, deletePost, moderatePost, getAllPendingPosts } = require('../controllers/postController');
+const { createPost, getAllPosts, getUserPosts, getPostsByAuthor, getPost, getPostImage, getCatPosts, searchPosts, editPost, deletePost, moderatePost, getAllPendingPosts } = require('../controllers/postController');
 const { protect, adminOnly } = require('../middleware/authMiddleware');
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.get('/image/:id', getPostImage);
 router.get('/category/:category', protect, getCatPosts);
 router.get('/search', protect, searchPosts);
 router.get('/pending', protect, adminOnly, getAllPendingPosts);
+router.get('/author/:userId', protect, getPostsByAuthor);
 router.get('/:id', protect, getPost);
 router.put('/:id', protect, editPost);
 router.delete('/:id', protect, deletePost);

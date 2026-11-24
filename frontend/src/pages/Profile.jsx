@@ -4,7 +4,7 @@ import axiosInstance from '../axiosConfig';
 import Avatar from '../images/avatar.png';
 import { API_URL } from '../config';
 import PostItem from '../components/PostItem';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import ProfileBio from '../components/Profile/ProfileBio';
 import ProfileBadges from '../components/Profile/ProfileBadges';
 import ProfilePostStats from '../components/Profile/ProfilePostStats';
@@ -13,6 +13,9 @@ import ProfilePostStats from '../components/Profile/ProfilePostStats';
 
 const Profile = () => {
   const { user } = useAuth(); // Access user token from context
+  const { userId } = useParams();
+  const isOwnProfile = !userId || userId === user?.id;
+  const profileId = isOwnProfile ? user?.id : userId;
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,7 +39,8 @@ const Profile = () => {
       setError('');
       setMessage('');
       try {
-          const response = await axiosInstance.get('/api/user/profile', {
+        const url = isOwnProfile ? '/api/user/profile' : `/api/user/profile/${userId}`;  
+        const response = await axiosInstance.get(url, {
             headers: { Authorization: `Bearer ${user.token}` },
           });
           setFormData({
@@ -54,13 +58,14 @@ const Profile = () => {
     };
 
     if (user) fetchProfile();
-  }, [user]);
+  }, [user, userId]);
 
     const [posts, setPosts] = useState([]);
 
     const fetchUserPosts = async () => {
         try {
-            const response = await axiosInstance.get(`/api/posts/user`, {
+          const url = isOwnProfile ? '/api/posts/user' : `/api/posts/author/${userId}`;  
+          const response = await axiosInstance.get(url, {
             headers: { Authorization: `Bearer ${user.token}` },
             });
             setPosts(response.data);
@@ -71,7 +76,7 @@ const Profile = () => {
 
   useEffect(() => {
         if (user)  fetchUserPosts();
-    }, [user]);
+    }, [user, userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -128,15 +133,16 @@ const Profile = () => {
 
   return (
     <div className="max-w-6xl mx-auto mt-20 flex gap-8">
-      <form onSubmit={handleSubmit} className="form bg-white p-6 w-1/3 rounded shadow-md">
-        <h1 className="text-2xl font-bold text-center">Your Profile</h1>
+      {isOwnProfile ? (
+        <form onSubmit={handleSubmit} className="form bg-white p-6 w-1/3 rounded shadow-md">
+          <h1 className="text-2xl font-bold text-center">Your Profile</h1>
 
           <img
     src={
       image
         ? URL.createObjectURL(image)
         : formData.hasProfileImage
-        ? `${API_URL}/api/user/user-image/${user.id}?t=${avatarVersion}`
+        ? `${API_URL}/api/user/user-image/${profileId}?t=${avatarVersion}`
         : Avatar  
     }
     alt="Profile"
@@ -195,6 +201,20 @@ const Profile = () => {
           {saving ? 'Updating...' : 'Update Profile'}
         </button>
       </form>
+      ) : (
+        <div className="bg-white p-6 w-1/3 rounded shadow-md text-center">
+    <img
+      src={
+        formData.hasProfileImage
+          ? `${API_URL}/api/user/user-image/${profileId}?t=${avatarVersion}`
+          : Avatar
+      }
+      alt="Profile"
+      className="profile-image mb-4"
+    />
+    <h1 className="text-2xl font-bold">{formData.name}</h1>
+  </div>
+)}
 
     <section className="category_posts flex-1 mt-0">
       <div className="space-y-4">
