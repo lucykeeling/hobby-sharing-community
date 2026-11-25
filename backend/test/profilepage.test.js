@@ -80,7 +80,7 @@ describe('HSC-142: Author profile page - getUserPosts', () => {
 
 describe('HSC-142: Author profile page - getPublicProfile', () => {
     const validId = new mongoose.Types.ObjectId().toString();
-    const fakeUser = { name: 'Test Author', email: 'a@b.com', profileImage: { data: Buffer.from('x') } };
+    const fakeUser = { name: 'Test Author', email: 'a@b.com', profileImage: { data: Buffer.from('x') }, _id: new mongoose.Types.ObjectId() };
     let req, res;
 
     beforeEach(() => {
@@ -91,13 +91,14 @@ describe('HSC-142: Author profile page - getPublicProfile', () => {
     it('should return public profile for a valid user ID', async () => {
         const chain = { select: sinon.stub().resolves(fakeUser) };
         sinon.stub(User, 'findById').returns(chain);
+        sinon.stub(Post, 'countDocuments').resolves(2);
 
         await getPublicProfile(req, res);
 
         expect(User.findById.calledOnceWith(validId)).to.be.true;
-        expect(chain.select.calledWith('name profileImage')).to.be.true;
+        expect(chain.select.calledWith('-password -email')).to.be.true;
         expect(res.status.calledWith(200)).to.be.true;
-        expect(res.json.calledWith({ name: fakeUser.name, hasProfileImage: !!fakeUser.profileImage?.data })).to.be.true;
+        expect(res.json.calledWith({ name: fakeUser.name, hasProfileImage: !!fakeUser.profileImage?.data, postStats: { postsCount: 2 } })).to.be.true;
     });
 
     it('should return 404 for an invalid user ID', async () => {

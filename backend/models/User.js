@@ -9,6 +9,13 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['Member', 'Admin'], default: 'Member' },
     postCount: { type: Number, default: 0 },
     profileImage: { data: Buffer, contentType: String },
+    bio: { type: String, default: '' },
+    badges: [{ name: String, description: String }],
+    visibility: {
+        bio: { type: Boolean, default: true },
+        badges: { type: Boolean, default: true },
+        postStats: { type: Boolean, default: true },
+    },
 });
 
 userSchema.pre('save', async function (next) {

@@ -23,7 +23,8 @@ const Profile = () => {
     postCount: '',
     hasProfileImage: false,
   });
-  const [visibility, setVisibility] = useState({ bio: true, badges: true, posts: true });
+  const [visibility, setVisibility] = useState({ bio: true, badges: true, postStats: true });
+  const [savingVisibility, setSavingVisibility] = useState(false);
   const [image, setImage] = useState(null);
   const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,7 @@ const Profile = () => {
   const [message, setMessage] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [sections, setSections] = useState({});
 
   useEffect(() => {
     // Fetch profile data from the backend
@@ -53,6 +55,8 @@ const Profile = () => {
           hasProfileImage: response.data.hasProfileImage,
         });
         setIsAdmin(response.data.role === 'Admin');
+        setSections({ bio: response.data.bio, badges: response.data.badges, postStats: response.data.postStats });
+        if (response.data.visibility) setVisibility(response.data.visibility);
       } catch (error) {
         if (error.response?.status === 404) {
           setNotFound(true);
@@ -115,8 +119,26 @@ const Profile = () => {
       ;
     }
   };
+  const handleToggle = async (key) => {
+  const previous = visibility;
+  const next = { ...visibility, [key]: !visibility[key] };
 
-  const isVisible = (section) => isOwnProfile || visibility[section];
+  setVisibility(next);         
+  setSavingVisibility(true);
+  setMessage(null);
+  try {
+    await axiosInstance.put('/api/user/profile',
+      { visibility: JSON.stringify(next) },
+      { headers: { Authorization: `Bearer ${user.token}` } });
+  } catch (error) {
+    setVisibility(previous);   
+    setMessage({ type: 'error', text: error.response?.data?.message || 'Could not save visibility.' });
+  } finally {
+    setSavingVisibility(false);
+  }
+};
+
+  const isVisible = (section) => isOwnProfile ? visibility[section] : sections[section] !== undefined;
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -197,7 +219,8 @@ const Profile = () => {
                 <input
                   type="checkbox"
                   checked={visibility[key]}
-                  onChange={() => setVisibility((v) => ({ ...v, [key]: !v[key] }))}
+                  disabled={savingVisibility}
+                  onChange={() => handleToggle(key)}
                   className="mr-2"
                 />
                 {key}
@@ -254,9 +277,9 @@ const Profile = () => {
 
       <section className="category_posts flex-1 mt-0">
         <div className="space-y-4">
-          {isVisible('bio') && <ProfileBio bio="Hello, this is a test bio" />}
-          {isVisible('badges') && <ProfileBadges badges={['Early Adopter', 'Top Poster']} />}
-          {isVisible('posts') && <ProfilePostStats postsCount={posts.length} />}
+          {isVisible('bio') && <ProfileBio bio= {sections.bio} />}
+          {isVisible('badges') && <ProfileBadges badges={sections.badges} />}
+          {isVisible('postStats') && <ProfilePostStats postsCount={sections.postStats?.postsCount} />}
         </div>
 
         {posts.length > 0 ? <div className="container profile_post_container">

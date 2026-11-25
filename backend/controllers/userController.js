@@ -1,44 +1,38 @@
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const { buildProfile } = require('../profile/ProfileBuilder');
+const Post = require('../models/post')
 
 
 const getProfile = async (req, res) => {
     try {
-      const user = await User.findById(req.user.id);
-      if (!user) {
+        const user = await User.findById(req.user.id);
+        if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-    
-        res.status(200).json({
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            postCount: user.postCount,
-            hasProfileImage: !!user.profileImage?.data,
-        });
-        } catch (error) {
+        const postsCount = await Post.countDocuments({ creator: user._id });
+        res.status(200).json(buildProfile(user, { isOwner: true, postsCount }));
+    } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
-        }
-    };
+    }
+};
 
 const getPublicProfile = async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
         return res.status(404).json({ message: 'User not found' });
     }
     try {
-        const user = await User.findById(req.params.id).select('name profileImage');
+        const user = await User.findById(req.params.id).select('-password -email');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({
-            name: user.name,
-            hasProfileImage: !!user.profileImage?.data,
-        });
+        const postsCount = await Post.countDocuments({ creator: user._id, postStatus: 'approved' });
+        res.status(200).json(buildProfile(user, { isOwner: false, postsCount }));
     } catch (error) {
         res.status(500).json({ message: 'An unexpected error occurred while fetching the user profile' });
     }
-};   
+};
 
 const getUserImage = async (req, res) => {
     try {
@@ -67,14 +61,16 @@ const getUserPosts = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-            try {
-                const user = await User.findById(req.user.id);
-                if (!user) return res.status(404).json({ message: 'User not found' });
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
 
-                const { name, email, role } = req.body;
-                user.name = name || user.name;
-                user.email = email || user.email;
-            
+        const { name, email, role } = req.body;
+        user.name = name || user.name;
+        user.email = email || user.email;
+
+        if (req.body.visibility) user.visibility = JSON.parse(req.body.visibility);
+        if (req.body.bio !== undefined) user.bio = req.body.bio;
 
         if (req.body.role && req.body.role !== user.role) {
             if (req.user.role !== 'Admin') {
@@ -83,20 +79,20 @@ const updateUserProfile = async (req, res) => {
             user.role = req.body.role;
         }
         if (req.files && req.files.profileImage) {
-            const { profileImage } = req.files; 
-        
-        if (profileImage.size > 2000000) {
-        return res.status(422).json({ message: 'File size should be less than 2MB' });
+            const { profileImage } = req.files;
+
+            if (profileImage.size > 2000000) {
+                return res.status(422).json({ message: 'File size should be less than 2MB' });
+            }
+            if (!['image/png', 'image/jpeg'].includes(profileImage.mimetype)) {
+                return res.status(422).json({ message: 'Only PNG or JPEG images allowed' });
+            }
+
+            user.profileImage = {
+                data: profileImage.data,
+                contentType: profileImage.mimetype
+            };
         }
-        if (!['image/png', 'image/jpeg'].includes(profileImage.mimetype)) {
-            return res.status(422).json({ message: 'Only PNG or JPEG images allowed' });
-        }
-       
-        user.profileImage = {
-            data: profileImage.data,
-            contentType: profileImage.mimetype
-        };
-    }
         user.postCount = req.body.postCount || user.postCount; // Only allow post count change if provided
 
         const updatedUser = await user.save();
