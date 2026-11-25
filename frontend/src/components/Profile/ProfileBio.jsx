@@ -1,28 +1,22 @@
 import { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+
+export const MAX_BIO_LENGTH = 300;
+
+export const validateBio = (bio = '') => {
+  const { length } = bio.trim();
+  if (length > MAX_BIO_LENGTH) {
+    return `Bio must be ${MAX_BIO_LENGTH} characters or fewer (currently ${length}).`;
+  }
+  return '';
+};
 
 const ProfileBio = ({ bio, isOwner, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const hasBio = Boolean(bio?.trim());
+  const length = draft.trim().length;
+  const error = validateBio(draft);
 
-      const modules = {
-        toolbar: [
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
-            ['link', 'image'],
-            ['clean']
-        ],
-    };
-
-    const formats = [
-        'header',
-        'bold', 'italic', 'underline', 'strike', 'blockquote',
-        'list', 'bullet', 'indent',
-        'link', 'image'
-    ];
 
   const startEditing = () => {
     setDraft(bio || '');
@@ -31,7 +25,8 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(draft);
+    if (error) return;
+    onSave(draft.trim());
     setIsEditing(false);
   };
 
@@ -41,15 +36,21 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
 
       {isOwner && isEditing ? (
         <form onSubmit={handleSubmit}>
-        <ReactQuill 
-        modules={modules} 
-        formats={formats} 
-        value={draft} 
-        onChange={setDraft} 
-        placeholder="Write your bio here..." 
-        className="q1-editor" />
+          <textarea
+            aria-label="Bio"
+            aria-invalid={Boolean(error)}
+            rows="4"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Write a short bio about yourself..."
+            className="w-full mb-1 p-2 border rounded ${error ? 'border-red-500' : 'border-gray-300'}"
+          />
+          <p className={`text-sm ${error ? 'text-red-500' : 'text-gray-500'}`}>
+            {length}/{MAX_BIO_LENGTH} characters
+          </p>
+          {error && <p className="text-red-600 mb-2" role="alert">{error}</p>}
 
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mr-2">
+          <button type="submit" disabled={Boolean(error)} className="bg-blue-600 text-white px-4 py-2 rounded mr-2">
             Save
           </button>
           <button type="button" onClick={() => setIsEditing(false)} className="border px-4 py-2 rounded">
@@ -59,7 +60,7 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
       ) : (
         <>
           {hasBio ? (
-            <p>{bio}</p>
+            <p className="whitespace-pre-wrap break-words">{bio}</p>
           ) : (
             <p className="text-gray-500 italic">
               {isOwner ? "You haven't added a bio yet." : 'No bio yet.'}

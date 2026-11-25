@@ -281,14 +281,14 @@ const Profile = () => {
             <ProfileBio
               bio={sections.bio}
               isOwner={isOwnProfile}
-              onSave={(bio) => console.log({ bio })} // temporary: replaced in step 3
+              onSave={(bio) => console.log({ bio })} 
             />
           )}
           {isVisible('badges') && (
             <ProfileBadges
               badges={sections.badges}
               isOwner={isOwnProfile}
-              onSave={(badges) => console.log({ badges })} // temporary: replaced in step 3
+              onSave={(badges) => console.log({ badges })} 
             />
           )}
           {isVisible('postStats') && <ProfilePostStats postsCount={sections.postStats?.postsCount} isOwner={isOwnProfile} />}
