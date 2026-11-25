@@ -287,7 +287,7 @@ const Profile = () => {
         </div>
       )}
 
-      <section className="category_posts flex-1 mt-0">
+      <section className="profile_category_posts flex-1 mt-0">
         <div className="space-y-4">
           {isVisible('bio') && (
             <ProfileBio
