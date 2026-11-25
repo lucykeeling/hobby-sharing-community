@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['Member', 'Admin'], default: 'Member' },
     postCount: { type: Number, default: 0 },
     profileImage: { data: Buffer, contentType: String },
-    bio: { type: String, default: '' },
+    bio: { type: String, default: '', maxlength: 300 },
     badges: [{ name: String, description: String }],
     visibility: {
         bio: { type: Boolean, default: true },

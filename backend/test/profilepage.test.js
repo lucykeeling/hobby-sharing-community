@@ -396,3 +396,5 @@ describe('HSC-143: Visible profile sections - updateUserProfile', () => {
 
     afterEach(() => sinon.restore());
 });
+
+// Validatebio & Validatebadges

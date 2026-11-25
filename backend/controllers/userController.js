@@ -2,6 +2,8 @@ const User = require('../models/User');
 const mongoose = require('mongoose');
 const { buildProfile } = require('../profile/ProfileBuilder');
 const Post = require('../models/post')
+const { MAX_BADGES, BADGE_OPTIONS } = require('../profile/BadgesDecorator');
+const MAX_BIO_LENGTH = 300;
 
 
 const getProfile = async (req, res) => {
@@ -65,12 +67,25 @@ const updateUserProfile = async (req, res) => {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        const { name, email, role } = req.body;
+        const { name, email, bio, badges } = req.body;
         user.name = name || user.name;
         user.email = email || user.email;
 
         if (req.body.visibility) user.visibility = JSON.parse(req.body.visibility);
-        if (req.body.bio !== undefined) user.bio = req.body.bio;
+
+        if (bio !== undefined) {
+            const bioError = validateBio(bio);
+            if (bioError) return res.status(422).json({ message: bioError });
+            user.bio = bio.trim();
+        }
+        if (badges !== undefined) {
+            const badgesError = validateBadges(badges);
+            if (badgesError)
+                return res.status(422).json({ message: badgesError });
+
+            const names = badges.map((badge) => badge?.name);
+            user.badges = BADGE_OPTIONS.filter((option) => names.includes(option.name));
+        }
 
         if (req.body.role && req.body.role !== user.role) {
             if (req.user.role !== 'Admin') {
@@ -93,13 +108,48 @@ const updateUserProfile = async (req, res) => {
                 contentType: profileImage.mimetype
             };
         }
-        user.postCount = req.body.postCount || user.postCount; // Only allow post count change if provided
+        user.postCount = req.body.postCount || user.postCount;
 
         const updatedUser = await user.save();
-        res.json({ id: updatedUser.id, name: updatedUser.name, email: updatedUser.email, role: updatedUser.role, hasProfileImage: !!updatedUser.profileImage?.data });
+        res.json({
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            hasProfileImage: !!updatedUser.profileImage?.data,
+            bio: updatedUser.bio,
+            badges: updatedUser.badges,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = { updateUserProfile, getProfile, getPublicProfile, getUserImage, getUserPosts };
+const getBadgeOptions = (req, res) => {
+    res.status(200).json({ options: BADGE_OPTIONS, maxBadges: MAX_BADGES });
+};
+
+const validateBio = (bio = '') => {
+    if (typeof bio !== 'string') return 'Bio must be a text.';
+    if (bio.trim().length > MAX_BIO_LENGTH) {
+        return `Bio must be ${MAX_BIO_LENGTH} characters or fewer`;
+    }
+    return '';
+};
+
+const validateBadges = (badges = []) => {
+    if (!Array.isArray(badges)) return 'Badges must be a list.';
+    if (badges.length > MAX_BADGES) {
+        return `You can select up to ${MAX_BADGES} badges`;
+    }
+    const names = badges.map((badge) => badge?.name);
+    if (!names.every((name) => BADGE_OPTIONS.some((option) => option.name === name))) {
+        return 'Unknown badge selected';
+    }
+    if (new Set(names).size !== names.length) {
+        return 'Each badge can only be selected once';
+    }
+    return '';
+};
+
+module.exports = { updateUserProfile, getProfile, getPublicProfile, getUserImage, getUserPosts, validateBio, validateBadges, getBadgeOptions };

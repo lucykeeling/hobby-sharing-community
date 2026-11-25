@@ -1,36 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axiosInstance from '../../axiosConfig';
 
-const MAX_BADGES = 5;
-
-const BADGE_OPTIONS = [
-  { name: 'Beginner', description: 'Just getting started' },
-  { name: 'Enthusiast', description: 'Loves spending time on hobbies' },
-  { name: 'Mentor', description: 'Happy to help others learn' },
-  { name: 'Collaborator', description: 'Keen to work on shared projects' },
-  { name: 'Crafter', description: 'Makes things by hand' },
-  { name: 'Artist', description: 'Draws, paints or designs' },
-  { name: 'Gardener', description: 'Grows plants and food' },
-  { name: 'Home Cook', description: 'Enjoys cooking and baking' },
-  { name: 'Photographer', description: 'Captures moments on camera' },
-  { name: 'Musician', description: 'Plays or creates music' },
-  { name: 'Bookworm', description: 'Always has a book on the go' },
-  { name: 'Gamer', description: 'Enjoys video or tabletop games' },
-  { name: 'Outdoor Explorer', description: 'Hikes, camps and explores' },
-  { name: 'Fitness Fan', description: 'Stays active through sport or exercise' },
-  { name: 'DIY Builder', description: 'Builds and repairs things' },
-];
 
 const ProfileBadges = ({ badges, isOwner, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [selected, setSelected] = useState([]); 
+  const [catalogue, setCatalogue] = useState( {options: [], maxBadges: 0} );
+  const { options, maxBadges } = catalogue;
   const hasBadges = badges && badges.length > 0;
-  const limitReached = selected.length >= MAX_BADGES;
+  const limitReached = selected.length >= maxBadges;
+
+  useEffect(() => {
+    if (!isOwner) return;
+    axiosInstance.get('/api/user/badges')
+      .then((response) => setCatalogue(response.data))
+      .catch((error) => console.error('Could not load badges:', error.message));
+  }, [isOwner]);
+
 
   const startEditing = () => {
     const savedNames = (badges || []).map((badge) => badge.name);
     
     setSelected(
-      BADGE_OPTIONS.map((option) => option.name).filter((name) => savedNames.includes(name))
+      options.map((option) => option.name).filter((name) => savedNames.includes(name))
     );
     setIsEditing(true);
   };
@@ -45,7 +37,7 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(BADGE_OPTIONS.filter((option) => selected.includes(option.name)));
+    onSave(options.filter((option) => selected.includes(option.name)));
     setIsEditing(false);
   };
 
@@ -56,10 +48,10 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
       {isOwner && isEditing ? (
         <form onSubmit={handleSubmit}>
           <p className="mb-2" aria-live="polite">
-            {selected.length} of {MAX_BADGES} selected
+            {selected.length} of {maxBadges} selected
           </p>
           <div className="grid grid-cols-2 gap-2 mb-3">
-            {BADGE_OPTIONS.map(({ name, description }) => {
+            {options.map(({ name, description }) => {
               const checked = selected.includes(name);
               return (
                 <label key={name} className="flex items-start gap-2">
@@ -87,11 +79,10 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
       ) : (
         <>
           {hasBadges ? (
-            <ul className="badge-list">
+            <ul className="flex flex-wrap gap-2 mb-2">
               {badges.map((badge) => (
-                <li key={badge.name} className="badge-item">
-                  <span className="badge-name">{badge.name}</span>
-                  <span className="badge-description">{badge.description}</span>
+                <li key={badge.name} title={badge.description} className="rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-sm font-semibold">
+                  {badge.name}
                 </li>
               ))}
             </ul>
@@ -101,7 +92,7 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
             </p>
           )}
           {isOwner && (
-            <button type="button" onClick={startEditing} className="text-blue-600 mt-2">
+            <button type="button" onClick={startEditing} disabled={options.length === 0} className="text-blue-600 mt-2">
               Edit badges
             </button>
           )}

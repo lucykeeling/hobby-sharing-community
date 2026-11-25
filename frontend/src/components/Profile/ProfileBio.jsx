@@ -50,7 +50,7 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
           </p>
           {error && <p className="text-red-600 mb-2" role="alert">{error}</p>}
 
-          <button type="submit" disabled={Boolean(error)} className="bg-blue-600 text-white px-4 py-2 rounded mr-2">
+          <button type="submit" disabled={Boolean(error)} opacity-50 className="bg-blue-600 text-white px-4 py-2 rounded mr-2">
             Save
           </button>
           <button type="button" onClick={() => setIsEditing(false)} className="border px-4 py-2 rounded">
