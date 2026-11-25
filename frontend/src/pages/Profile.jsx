@@ -138,6 +138,17 @@ const Profile = () => {
     }
   };
 
+  const saveProfileDetails = async (changes) => {
+    try {
+      await axiosInstance.put('/api/user/profile', changes, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+    console.log('Saved', changes);
+    } catch (error) {
+      console.error('Error saving profile details:', error.response?.data?.message || error.message);
+    }
+  };
+
   const isVisible = (section) => isOwnProfile ? visibility[section] : sections[section] !== undefined;
 
   if (!user) {
@@ -281,14 +292,14 @@ const Profile = () => {
             <ProfileBio
               bio={sections.bio}
               isOwner={isOwnProfile}
-              onSave={(bio) => console.log({ bio })} 
+              onSave={(bio) => saveProfileDetails({ bio })} 
             />
           )}
           {isVisible('badges') && (
             <ProfileBadges
               badges={sections.badges}
               isOwner={isOwnProfile}
-              onSave={(badges) => console.log({ badges })} 
+              onSave={(badges) => saveProfileDetails({ badges })} 
             />
           )}
           {isVisible('postStats') && <ProfilePostStats postsCount={sections.postStats?.postsCount} isOwner={isOwnProfile} />}

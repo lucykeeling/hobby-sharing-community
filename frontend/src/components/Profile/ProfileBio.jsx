@@ -43,7 +43,7 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Write a short bio about yourself..."
-            className="w-full mb-1 p-2 border rounded ${error ? 'border-red-500' : 'border-gray-300'}"
+            className={`w-full mb-1 p-2 border rounded ${error ? 'border-red-500' : 'border-gray-300'}`}
           />
           <p className={`text-sm ${error ? 'text-red-500' : 'text-gray-500'}`}>
             {length}/{MAX_BIO_LENGTH} characters
