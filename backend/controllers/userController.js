@@ -132,7 +132,7 @@ const getBadgeOptions = (req, res) => {
 const validateBio = (bio = '') => {
     if (typeof bio !== 'string') return 'Bio must be a text.';
     if (bio.trim().length > MAX_BIO_LENGTH) {
-        return `Bio must be ${MAX_BIO_LENGTH} characters or fewer`;
+        return `Bio must be ${MAX_BIO_LENGTH} characters or less`;
     }
     return '';
 };

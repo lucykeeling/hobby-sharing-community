@@ -5,7 +5,7 @@ export const MAX_BIO_LENGTH = 300;
 export const validateBio = (bio = '') => {
   const { length } = bio.trim();
   if (length > MAX_BIO_LENGTH) {
-    return `Bio must be ${MAX_BIO_LENGTH} characters or fewer (currently ${length}).`;
+    return `Bio must be ${MAX_BIO_LENGTH} characters or less (currently ${length}).`;
   }
   return '';
 };

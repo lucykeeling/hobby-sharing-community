@@ -3,13 +3,16 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const sinon = require('sinon');
 const { getUserPosts, getPostsByAuthor } = require('../controllers/postController');
-const { getPublicProfile, getProfile, updateUserProfile } = require('../controllers/userController');
+const { getPublicProfile, getProfile, updateUserProfile, validateBio, validateBadges } = require('../controllers/userController');
 const { buildProfile } = require('../profile/ProfileBuilder');
 const ProfileComponent = require('../profile/ProfileComponent');
 const ProfileDecorator = require('../profile/ProfileDecorator');
 const Post = require('../models/post');
 const User = require('../models/User');
+const { profileOwnerOnly } = require('../middleware/profileMiddleware');
+const { MAX_BADGES, BADGE_OPTIONS } = require('../profile/BadgesDecorator');
 const { expect } = chai;
+
 
 
 
@@ -398,3 +401,64 @@ describe('HSC-143: Visible profile sections - updateUserProfile', () => {
 });
 
 // Validatebio & Validatebadges
+
+const makeRes = () => ({ json: sinon.spy(), status: sinon.stub().returnsThis() });
+
+describe('HSC-144: Edit bio and badges - validateBio', () => {
+
+    it('should accept a valid bio', () => {
+        expect(validateBio('This is a valid bio.')).to.equal('');
+
+    });
+
+    it('should reject a bio that is too long', () => {
+        const longBio = 'a'.repeat(301);
+        expect(validateBio(longBio)).to.equal('Bio must be 300 characters or less');
+    });
+
+});
+
+describe('HSC-144: Edit bio and badges - validateBadges', () => {
+    const pick = (count) => BADGE_OPTIONS.slice(0, count);
+
+    it('should accept up to a maximum of 5 badges', () => {
+        expect(validateBadges(pick(MAX_BADGES))).to.equal('');
+    });
+    it('should reject more than 5 badges', () => {
+        expect(validateBadges(pick(MAX_BADGES + 1))).to.equal(`You can select up to ${MAX_BADGES} badges`);
+    });
+    it('should reject a made-up badge that is not in the options', () => {
+        expect(validateBadges([{name: 'Made Up Badge'}])).to.equal('Unknown badge selected');
+    });
+});
+
+describe('HSC-144: Edit bio and badges - profileOwnerOnly', () => {
+    let res, next;
+
+    beforeEach(() => {
+        res = makeRes();
+        next = sinon.spy();
+    });
+
+    it('should allow the owner to proceed', () => {
+        profileOwnerOnly({ user: { id: 'abc' }, params: { id: 'abc' } }, res, next);
+
+        expect(next.calledOnce).to.be.true;
+    });
+
+    it('should deny access to non-owners', () => {
+        profileOwnerOnly({ user: { id: 'abc' }, params: { id: 'def' } }, res, next);
+
+        expect(res.status.calledWith(403)).to.be.true;
+        expect(next.called).to.be.false;
+    });
+
+    it('should return 401 if there is no user', () => {
+        profileOwnerOnly({ user: null, params: {} }, res, next);
+
+        expect(res.status.calledWith(401)).to.be.true;
+        expect(next.called).to.be.false;
+    });
+
+    afterEach(() => sinon.restore());
+});
