@@ -514,6 +514,11 @@ footer {
     margin-top: 2rem;
 }
 
+.category_posts {
+    margin-top: -6rem;
+}
+
+
 /*============Error Page ============*/
 
 .error-page h2 {

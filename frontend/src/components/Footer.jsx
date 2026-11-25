@@ -34,7 +34,7 @@ const Footer = () => {
                 ))}
             </ul>
             <div className="footer_copyright">
-                <small> All Rights Reserved &copy; Copyright, Lucy Keeling n810251.</small>
+                <small> All Rights Reserved &copy; Copyright, Lucy Keeling n8102571, Harsha Joshi n12449369 & Iwan Kaczmar-Donaghue n***.</small>
             </div>
         </footer>
     );
