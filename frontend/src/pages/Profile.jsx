@@ -139,14 +139,9 @@ const Profile = () => {
   };
 
   const saveProfileDetails = async (changes) => {
-    try {
       await axiosInstance.put('/api/user/profile', changes, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-    console.log('Saved', changes);
-    } catch (error) {
-      console.error('Error saving profile details:', error.response?.data?.message || error.message);
-    }
   };
 
   const isVisible = (section) => isOwnProfile ? visibility[section] : sections[section] !== undefined;

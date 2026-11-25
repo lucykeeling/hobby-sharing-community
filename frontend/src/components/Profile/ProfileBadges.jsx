@@ -6,6 +6,8 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [selected, setSelected] = useState([]); 
   const [catalogue, setCatalogue] = useState( {options: [], maxBadges: 0} );
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(null);
   const { options, maxBadges } = catalogue;
   const hasBadges = badges && badges.length > 0;
   const limitReached = selected.length >= maxBadges;
@@ -20,12 +22,20 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
 
   const startEditing = () => {
     const savedNames = (badges || []).map((badge) => badge.name);
+
+    setStatus(null);
     
     setSelected(
       options.map((option) => option.name).filter((name) => savedNames.includes(name))
     );
     setIsEditing(true);
   };
+   
+  const cancelEditing = () => {
+    setStatus(null);
+    setIsEditing(false);
+  };
+
 
   const toggleBadge = (name) => {
     if (selected.includes(name)) {
@@ -35,11 +45,21 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    onSave(options.filter((option) => selected.includes(option.name)));
-    setIsEditing(false);
+    setSaving(true);
+    setStatus(null);  
+    try {
+      await onSave(options.filter((option) => selected.includes(option.name)));
+      setStatus({ type: 'success', text: 'Badges saved successfully.' });
+      setIsEditing(false);
+    } catch (err) {
+      setStatus({ type: 'error', text: err.response?.data?.message || 'Could not save your badges. Please try again.' });
+    } finally {
+      setSaving(false);
+    }
   };
+
 
   return (
     <section className="bg-white p-4 rounded shadow-md mb-4">
@@ -69,10 +89,10 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
               );
             })}
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mr-2">
-            Save
+          <button type="submit" disabled={saving} className="bg-blue-600 text-white px-4 py-2 rounded mr-2 disabled:opacity-50">
+            {saving ? 'Saving...' : 'Save'}
           </button>
-          <button type="button" onClick={() => setIsEditing(false)} className="border px-4 py-2 rounded">
+          <button type="button" disabled={saving} onClick={cancelEditing} className="border px-4 py-2 rounded">
             Cancel
           </button>
         </form>
@@ -98,8 +118,12 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
           )}
         </>
       )}
+      {status && (
+        <p className={`mt-2 ${status.type === 'error' ? 'text-red-600' : 'text-green-600'}`} role="alert">
+          {status.text}
+        </p>  
+    )}
     </section>
-  );
-};
+  )}
 
 export default ProfileBadges;

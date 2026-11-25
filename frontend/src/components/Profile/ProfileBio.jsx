@@ -13,6 +13,8 @@ export const validateBio = (bio = '') => {
 const ProfileBio = ({ bio, isOwner, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(null);
   const hasBio = Boolean(bio?.trim());
   const length = draft.trim().length;
   const error = validateBio(draft);
@@ -21,13 +23,29 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
   const startEditing = () => {
     setDraft(bio || '');
     setIsEditing(true);
+    setStatus(null);
   };
 
-  const handleSubmit = (e) => {
+  const cancelEditing = () => {
+    setStatus(null);
+    setIsEditing(false);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (error) return;
-    onSave(draft.trim());
-    setIsEditing(false);
+    setSaving(true);
+    setStatus(null);
+
+    try {
+      await onSave(draft.trim());
+      setStatus({ type: 'success', text: 'Bio saved successfully.' });
+      setIsEditing(false);
+    } catch (err) {
+      setStatus({ type: 'error', text: err.response?.data?.message || 'Could not save your bio. Please try again.' });
+    } finally {
+      setSaving(false);
+    }   
   };
 
   return (
@@ -50,10 +68,10 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
           </p>
           {error && <p className="text-red-600 mb-2" role="alert">{error}</p>}
 
-          <button type="submit" disabled={Boolean(error)} opacity-50 className="bg-blue-600 text-white px-4 py-2 rounded mr-2">
-            Save
+          <button type="submit" disabled={saving || Boolean(error)} className="bg-blue-600 text-white px-4 py-2 rounded mr-2 disabled:opacity-50">
+            {saving ? 'Saving...' : 'Save'}
           </button>
-          <button type="button" onClick={() => setIsEditing(false)} className="border px-4 py-2 rounded">
+          <button type="button" onClick={cancelEditing} disabled={saving} className="border px-4 py-2 rounded">
             Cancel
           </button>
         </form>
@@ -72,6 +90,11 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
             </button>
           )}
         </>
+      )}
+      {status && (
+        <p className={`mt-2 ${status.type === 'error' ? 'text-red-600' : 'text-green-600'}`} role="alert">
+          {status.text}
+        </p>
       )}
     </section>
   );
