@@ -277,9 +277,9 @@ const Profile = () => {
 
       <section className="category_posts flex-1 mt-0">
         <div className="space-y-4">
-          {isVisible('bio') && <ProfileBio bio= {sections.bio} />}
-          {isVisible('badges') && <ProfileBadges badges={sections.badges} />}
-          {isVisible('postStats') && <ProfilePostStats postsCount={sections.postStats?.postsCount} />}
+          {isVisible('bio') && <ProfileBio bio= {sections.bio} isOwner={isOwnProfile} />}
+          {isVisible('badges') && <ProfileBadges badges={sections.badges} isOwner={isOwnProfile} />}
+          {isVisible('postStats') && <ProfilePostStats postsCount={sections.postStats?.postsCount} isOwner={isOwnProfile} />}
         </div>
 
         {posts.length > 0 ? <div className="container profile_post_container">
