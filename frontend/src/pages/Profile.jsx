@@ -120,23 +120,23 @@ const Profile = () => {
     }
   };
   const handleToggle = async (key) => {
-  const previous = visibility;
-  const next = { ...visibility, [key]: !visibility[key] };
+    const previous = visibility;
+    const next = { ...visibility, [key]: !visibility[key] };
 
-  setVisibility(next);         
-  setSavingVisibility(true);
-  setMessage(null);
-  try {
-    await axiosInstance.put('/api/user/profile',
-      { visibility: JSON.stringify(next) },
-      { headers: { Authorization: `Bearer ${user.token}` } });
-  } catch (error) {
-    setVisibility(previous);   
-    setMessage({ type: 'error', text: error.response?.data?.message || 'Could not save visibility.' });
-  } finally {
-    setSavingVisibility(false);
-  }
-};
+    setVisibility(next);
+    setSavingVisibility(true);
+    setMessage(null);
+    try {
+      await axiosInstance.put('/api/user/profile',
+        { visibility: JSON.stringify(next) },
+        { headers: { Authorization: `Bearer ${user.token}` } });
+    } catch (error) {
+      setVisibility(previous);
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Could not save visibility.' });
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
 
   const isVisible = (section) => isOwnProfile ? visibility[section] : sections[section] !== undefined;
 
@@ -277,8 +277,20 @@ const Profile = () => {
 
       <section className="category_posts flex-1 mt-0">
         <div className="space-y-4">
-          {isVisible('bio') && <ProfileBio bio= {sections.bio} isOwner={isOwnProfile} />}
-          {isVisible('badges') && <ProfileBadges badges={sections.badges} isOwner={isOwnProfile} />}
+          {isVisible('bio') && (
+            <ProfileBio
+              bio={sections.bio}
+              isOwner={isOwnProfile}
+              onSave={(bio) => console.log({ bio })} // temporary: replaced in step 3
+            />
+          )}
+          {isVisible('badges') && (
+            <ProfileBadges
+              badges={sections.badges}
+              isOwner={isOwnProfile}
+              onSave={(badges) => console.log({ badges })} // temporary: replaced in step 3
+            />
+          )}
           {isVisible('postStats') && <ProfilePostStats postsCount={sections.postStats?.postsCount} isOwner={isOwnProfile} />}
         </div>
 

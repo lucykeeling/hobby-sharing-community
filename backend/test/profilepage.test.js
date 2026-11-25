@@ -3,7 +3,10 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const sinon = require('sinon');
 const { getUserPosts, getPostsByAuthor } = require('../controllers/postController');
-const { getPublicProfile } = require('../controllers/userController');
+const { getPublicProfile, getProfile, updateUserProfile } = require('../controllers/userController');
+const { buildProfile } = require('../profile/ProfileBuilder');
+const ProfileComponent = require('../profile/ProfileComponent');
+const ProfileDecorator = require('../profile/ProfileDecorator');
 const Post = require('../models/post');
 const User = require('../models/User');
 const { expect } = chai;
@@ -80,7 +83,7 @@ describe('HSC-142: Author profile page - getUserPosts', () => {
 
 describe('HSC-142: Author profile page - getPublicProfile', () => {
     const validId = new mongoose.Types.ObjectId().toString();
-    const fakeUser = { name: 'Test Author', email: 'a@b.com', profileImage: { data: Buffer.from('x') }, _id: new mongoose.Types.ObjectId() };
+    const fakeUser = { name: 'Test Author', email: 'a@b.com', profileImage: { data: Buffer.from('x') }, _id: new mongoose.Types.ObjectId(), visibility: { postStats: true } };
     let req, res;
 
     beforeEach(() => {
@@ -199,6 +202,196 @@ describe('HSC-142: Author profile page - getPostsByAuthor', () => {
         expect(res.status.calledWith(500)).to.be.true;
         expect(res.json.calledWith({ message: 'An unexpected error occurred while fetching posts' })).to.be.true;
         expect(res.json.calledWith({ message: 'DB error' })).to.be.false;
+    });
+
+    afterEach(() => sinon.restore());
+});
+
+// Tests for Decorator pattern code
+const makeUser = (visibility = { bio: true, badges: true, postStats: true }) => ({
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Test Author',
+    email: 'abc@def.com',
+    role: 'Member',
+    bio: 'Hello there',
+    badges: [{ name: 'Early Adopter', description: 'Joined early' }],
+    visibility
+});
+
+const allHidden = { bio: false, badges: false, postStats: false };
+
+
+describe('HSC-143: Visible profile sections - abstract classes', () => {
+
+    it('should not allow ProfileComponent to be instantiated directly', () => {
+        expect(() => new ProfileComponent()).to.throw('ProfileComponent is abstract');
+    });
+
+    it('should not allow ProfileDecorator to be instantiated directly', () => {
+        expect(() => new ProfileDecorator({}, {})).to.throw('ProfileDecorator is abstract');
+    });
+});
+
+
+describe('HSC-143: Visible profile sections - buildProfile', () => {
+
+    it('should include all enabled sections for a visitor', () => {
+        const user = makeUser();
+
+        const result = buildProfile(user, { isOwner: false, postsCount: 3 });
+
+        expect(result.bio).to.equal(user.bio);
+        expect(result.badges).to.deep.equal(user.badges);
+        expect(result.postStats).to.deep.equal({ postsCount: 3 });
+    });
+
+    it('should leave out disabled sections for a visitor', () => {
+        const result = buildProfile(makeUser(allHidden), { isOwner: false, postsCount: 3 });
+
+        expect(result).to.not.have.any.keys('bio', 'badges', 'postStats');
+    });
+
+    it('should only leave out the section that is disabled', () => {
+        const user = makeUser({ bio: false, badges: true, postStats: true });
+
+        const result = buildProfile(user, { isOwner: false, postsCount: 3 });
+
+        expect(result).to.not.have.property('bio');
+        expect(result).to.include.keys('badges', 'postStats');
+    });
+
+    it('should not expose private fields to a visitor', () => {
+        const result = buildProfile(makeUser(), { isOwner: false });
+
+        expect(result).to.not.have.any.keys('email', 'role', 'visibility');
+    });
+
+    it('should include every section and private fields for the owner', () => {
+        const user = makeUser(allHidden);
+
+        const result = buildProfile(user, { isOwner: true, postsCount: 3 });
+
+        expect(result).to.include.keys('bio', 'badges', 'postStats');
+        expect(result.email).to.equal(user.email);
+        expect(result.role).to.equal(user.role);
+        expect(result.visibility).to.deep.equal(allHidden);
+    });
+
+    it('should keep empty sections so a fallback message can be shown', () => {
+        const user = { ...makeUser(), bio: '', badges: [] };
+
+        const result = buildProfile(user, { isOwner: false, postsCount: 0 });
+
+        expect(result.bio).to.equal('');
+        expect(result.badges).to.deep.equal([]);
+        expect(result.postStats).to.deep.equal({ postsCount: 0 });
+    });
+});
+
+
+describe('HSC-143: Visible profile sections - getProfile', () => {
+    let fakeUser, req, res;
+
+    beforeEach(() => {
+        fakeUser = makeUser(allHidden);
+        req = { user: { id: fakeUser._id.toString() } };
+        res = { json: sinon.spy(), status: sinon.stub().returnsThis() };
+    });
+
+    it('should return all sections and count every post for the owner', async () => {
+        sinon.stub(User, 'findById').resolves(fakeUser);
+        sinon.stub(Post, 'countDocuments').resolves(4);
+
+        await getProfile(req, res);
+
+        expect(Post.countDocuments.calledOnceWith({ creator: fakeUser._id })).to.be.true;
+        expect(res.status.calledWith(200)).to.be.true;
+        expect(res.json.firstCall.args[0]).to.include.keys('bio', 'badges', 'postStats', 'visibility');
+        expect(res.json.firstCall.args[0].postStats).to.deep.equal({ postsCount: 4 });
+    });
+
+    it('should return 500 if counting posts fails', async () => {
+        sinon.stub(User, 'findById').resolves(fakeUser);
+        sinon.stub(Post, 'countDocuments').rejects(new Error('DB error'));
+
+        await getProfile(req, res);
+
+        expect(res.status.calledWith(500)).to.be.true;
+        expect(res.json.calledWith({ message: 'Server error', error: 'DB error' })).to.be.true;
+    });
+
+    afterEach(() => sinon.restore());
+});
+
+
+describe('HSC-143: Visible profile sections - getPublicProfile', () => {
+    const validId = new mongoose.Types.ObjectId().toString();
+    let req, res;
+
+    beforeEach(() => {
+        req = { params: { id: validId } };
+        res = { json: sinon.spy(), status: sinon.stub().returnsThis() };
+    });
+
+    it('should return only enabled sections and count approved posts', async () => {
+        const fakeUser = makeUser({ bio: true, badges: false, postStats: true });
+        sinon.stub(User, 'findById').returns({ select: sinon.stub().resolves(fakeUser) });
+        sinon.stub(Post, 'countDocuments').resolves(3);
+
+        await getPublicProfile(req, res);
+
+        expect(Post.countDocuments.calledOnceWith({ creator: fakeUser._id, postStatus: 'approved' })).to.be.true;
+        expect(res.status.calledWith(200)).to.be.true;
+        expect(res.json.calledWith({
+            name: fakeUser.name,
+            hasProfileImage: false,
+            bio: fakeUser.bio,
+            postStats: { postsCount: 3 }
+        })).to.be.true;
+    });
+
+    afterEach(() => sinon.restore());
+});
+
+
+describe('HSC-143: Visible profile sections - updateUserProfile', () => {
+    let fakeUser, req, res;
+
+    beforeEach(() => {
+        fakeUser = makeUser();
+        fakeUser.save = sinon.stub().resolves(fakeUser);
+        req = { user: { id: fakeUser._id.toString() }, body: {} };
+        res = { json: sinon.spy(), status: sinon.stub().returnsThis() };
+    });
+
+    it('should save the visibility settings', async () => {
+        sinon.stub(User, 'findById').resolves(fakeUser);
+        req.body.visibility = JSON.stringify(allHidden);
+
+        await updateUserProfile(req, res);
+
+        expect(fakeUser.visibility).to.deep.equal(allHidden);
+        expect(fakeUser.save.calledOnce).to.be.true;
+    });
+
+    it('should keep the existing settings if visibility is not sent', async () => {
+        sinon.stub(User, 'findById').resolves(fakeUser);
+        req.body.name = 'New Name';
+
+        await updateUserProfile(req, res);
+
+        expect(fakeUser.visibility).to.deep.equal({ bio: true, badges: true, postStats: true });
+        expect(fakeUser.save.calledOnce).to.be.true;
+    });
+
+    it('should return 500 and not save if visibility is not valid JSON', async () => {
+        sinon.stub(User, 'findById').resolves(fakeUser);
+        req.body.visibility = 'not-json';
+
+        await updateUserProfile(req, res);
+
+        expect(res.status.calledWith(500)).to.be.true;
+        expect(fakeUser.save.called).to.be.false;
     });
 
     afterEach(() => sinon.restore());
