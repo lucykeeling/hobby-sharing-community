@@ -1,3 +1,5 @@
+//Concrete Decorator - adds the post stats to the profile dynamically 
+
 const ProfileDecorator = require('./ProfileDecorator');
 
 class PostStatsDecorator extends ProfileDecorator {

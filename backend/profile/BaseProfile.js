@@ -1,3 +1,5 @@
+//Concrete component - defines the basic behaiour which can be altered by decorators
+
 const ProfileComponent = require('./ProfileComponent');
 
 class BaseProfile extends ProfileComponent {

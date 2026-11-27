@@ -1,3 +1,5 @@
+// Client - can wrap component in mutliple layers of decorators
+
 const BaseProfile = require('./BaseProfile');
 const BioDecorator = require('./BioDecorator');
 const BadgesDecorator = require('./BadgesDecorator');

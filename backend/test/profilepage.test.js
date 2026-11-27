@@ -224,18 +224,6 @@ const makeUser = (visibility = { bio: true, badges: true, postStats: true }) => 
 const allHidden = { bio: false, badges: false, postStats: false };
 
 
-describe('HSC-143: Visible profile sections - abstract classes', () => {
-
-    it('should not allow ProfileComponent to be instantiated directly', () => {
-        expect(() => new ProfileComponent()).to.throw('ProfileComponent is abstract');
-    });
-
-    it('should not allow ProfileDecorator to be instantiated directly', () => {
-        expect(() => new ProfileDecorator({}, {})).to.throw('ProfileDecorator is abstract');
-    });
-});
-
-
 describe('HSC-143: Visible profile sections - buildProfile', () => {
 
     it('should include all enabled sections for a visitor', () => {

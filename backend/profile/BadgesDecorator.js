@@ -1,3 +1,5 @@
+//Concrete Decorator - adds the badges to the profile dynamically
+
 const ProfileDecorator = require('./ProfileDecorator');
 
 const MAX_BADGES = 5;
