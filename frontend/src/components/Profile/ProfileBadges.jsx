@@ -62,7 +62,7 @@ const ProfileBadges = ({ badges, isOwner, onSave }) => {
 
 
   return (
-    <section className="bg-white p-4 rounded shadow-md mb-4">
+    <section className="bg-white p-4 rounded shadow-md mt-0 mb-4">
       <h2 className="text-lg font-semibold mb-1">Badges</h2>
 
       {isOwner && isEditing ? (

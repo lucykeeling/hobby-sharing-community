@@ -49,7 +49,7 @@ const ProfileBio = ({ bio, isOwner, onSave }) => {
   };
 
   return (
-    <section className="bg-white p-4 rounded shadow-md mb-2">
+    <section className="bg-white p-4 rounded shadow-md mt-0 mb-2">
       <h2 className="text-lg font-semibold mb-2">Bio</h2>
 
       {isOwner && isEditing ? (
