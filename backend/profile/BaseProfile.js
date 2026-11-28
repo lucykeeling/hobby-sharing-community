@@ -4,7 +4,7 @@ const ProfileComponent = require('./ProfileComponent');
 
 class BaseProfile extends ProfileComponent {
     constructor(user, { isOwner = false } = {}) {
-        super();            
+        super();
         this.user = user;
         this.isOwner = isOwner;
     }
